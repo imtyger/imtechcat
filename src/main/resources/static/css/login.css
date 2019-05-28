@@ -1,0 +1,22 @@
+html{height: 100%;}
+body.signin{
+    background:#8c8c8c;
+    height: auto;
+    background: url("../img/login-background.jpg") no-repeat center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    color: #8a6d3b;
+}
+
+.signinpanel{
+    width: 320px;
+    margin: 10% auto 0 auto;
+}
+
+.signinpanel.loginpanel{
+    float: none;
+    width: auto;
+    padding: 0;
+    background: none;
+}
