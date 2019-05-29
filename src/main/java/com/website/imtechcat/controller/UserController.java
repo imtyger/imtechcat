@@ -45,21 +45,29 @@ public class UserController {
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
 	public ResponseEntity<?> loginPost(@RequestParam("username") String userName,
 															@RequestParam("password") String userPwd,
-															HashMap map){
+															ModelMap map){
 		logger.info("--loginPost:"+userName+","+userPwd);
 		try{
 			int count = userServiceImpl.login(userName,userPwd);
 			if(count != 1){
-				map.put("message","用户名密码错误");
+				map.put("code",401);
+				map.put("status","fail");
+				map.put("msg","用户名密码错误");
 				return new ResponseEntity<>("/login", HttpStatus.NOT_FOUND);
 			}
 			String token = jwtUtil.createToken(userName);
 			logger.info("创建token:"+token);
-			map.put("expire",1000 * 6);
-			map.put("token",token);
+			map.put("expire",jwtUtil.getExpire());
+			map.put("token",jwtUtil.getHeader());
 			map.put("userName",userName);
+			map.put("userPwd",userPwd);
+			map.put("code",200);
+			map.put("status","success");
 		}catch(Exception ex){
-			map.put("message",ex.getMessage());
+			map.put("code",402);
+			map.put("status","error");
+			map.put("msg",ex.getMessage());
+			return new ResponseEntity<>(map,HttpStatus.EXPECTATION_FAILED);
 		}
 		return new ResponseEntity<>(map,HttpStatus.OK);
 	}

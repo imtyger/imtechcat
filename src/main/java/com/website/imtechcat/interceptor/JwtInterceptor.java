@@ -63,9 +63,9 @@ public class JwtInterceptor extends HandlerInterceptorAdapter {
 
 	//获取请求token
 	private String getToken(HttpServletRequest request){
-		String token = request.getHeader("token");
+		String token = request.getHeader(jwt.getHeader());
 		if(token == null || token.trim().equals("")){
-			token = request.getParameter("token");
+			token = request.getParameter(jwt.getHeader());
 		}
 		return token;
 	}

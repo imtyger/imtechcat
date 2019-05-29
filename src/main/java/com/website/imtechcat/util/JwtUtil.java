@@ -2,15 +2,12 @@ package com.website.imtechcat.util;
 
 import io.jsonwebtoken.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-
-import javax.servlet.ServletException;
 import java.util.Date;
 
 /**
@@ -24,17 +21,47 @@ import java.util.Date;
 public class JwtUtil {
 	private static Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-	//加密秘钥
-	public static final String SECRET = "aHR0cHM6Ly9teS5vc2NoaW5hLm5ldC91LzM2ODE4Njg=";
-	//有效时间
-	public static final long EXPIRE = 1000 * 6;
-	//用户凭证
-	public static final String HEADER = "token";
+	// //加密秘钥
+	// public static final String SECRET = "aHR0cHM6Ly9teS5vc2NoaW5hLm5ldC91LzM2ODE4Njg=";
+	// //有效时间
+	// public static final long EXPIRE = 1000 * 6;
+	// //用户凭证
+	// public static final String HEADER = "token";
+
+	@Value("${spring.jwt.secret}")
+	private String secret;
+	@Value("${spring.jwt.expire}")
+	private String expire;
+	@Value("${spring.jwt.header}")
+	private String header;
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public String getExpire() {
+		return expire;
+	}
+
+	public String getHeader() {
+		return header;
+	}
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
+
+	public void setExpire(String expire) {
+		this.expire = expire;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
 
 	//解析token
 	public Claims parseToken(String jsonWebToken){
 		try{
-			Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(jsonWebToken).getBody();
+			Claims claims = Jwts.parser().setSigningKey(getSecret()).parseClaimsJws(jsonWebToken).getBody();
 			logger.info("从token中解析到的username:"+claims.toString());
 			return claims;
 		}catch(Exception ex) {
@@ -45,15 +72,15 @@ public class JwtUtil {
 
 	//生成token
 	public String createToken(String userName){
-		logger.info("header="+HEADER+",expire="+EXPIRE+",secret="+SECRET);
+		logger.info("header="+getHeader()+",expire="+getExpire()+",secret="+getSecret());
 		Date date = new Date();
-		Date expireDate = new Date(date.getTime()+ EXPIRE );
+		Date expireDate = new Date(date.getTime()+ Long.parseLong(getExpire()) );
 		JwtBuilder builder = Jwts.builder()
 				.setHeaderParam("typ","JWT")
 				.setSubject(userName)
 				.setIssuedAt(date)
 				.setExpiration(expireDate)
-				.signWith(SignatureAlgorithm.HS256,SECRET);
+				.signWith(SignatureAlgorithm.HS256,getSecret());
 		return builder.compact();
 	}
 
