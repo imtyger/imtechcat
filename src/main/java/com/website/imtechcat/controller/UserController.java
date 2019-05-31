@@ -58,7 +58,7 @@ public class UserController {
 			String token = jwtUtil.createToken(userName);
 			logger.info("创建token:"+token);
 			map.put("expire",jwtUtil.getExpire());
-			map.put("token",jwtUtil.getHeader());
+			map.put("token",token);
 			map.put("userName",userName);
 			map.put("userPwd",userPwd);
 			map.put("code",200);
