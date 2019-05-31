@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 
 /**
  * @ClassName UserServiceImpl
@@ -34,25 +33,39 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public int login(String userName, String userPwd) {
-		int count = 0;
-		User user = userRepository.findUserByUserNameAndUserPwd(userName,userPwd);
-		if(user != null){
-			count = 1;
+		logger.info("-------------------------");
+		User user = userRepository.findUserByUserName(userName);
+		logger.info("user:"+user.toString());
+		if(user == null){
+			logger.info("User : " + userName + " not exist.");
+			//用户不存在时返回0
+			return 0;
 		}
-		return count;
+		//这里需要做解密
+		String pwd = user.getUserPwd();
+		if(!userPwd.trim().equals(pwd)){
+			//密码错误返回1
+			return 1;
+		}
+		//密码正确成功返回2
+		return 2;
 	}
 
 	@Override
 	public int register(String userName, String userPwd) {
-		int count = 0;
-		User user = userRepository.findUserByUserNameAndUserPwd(userName,userPwd);
-		if(user != null){
-			return count;
+		try{
+			//此处需要创建用户id
+			User user = new User("",userName,userPwd,"","","","",0,0,0,"");
+			logger.info("register user:"+user.toString());
+			userRepository.save(user);
+			//创建成功返回1
+			return 1;
+		}catch (Exception ex){
+			logger.error("register user :" + userName + " fail.",ex.getMessage());
+			//失败返回0
+			return 0;
 		}
-		user = new User("",userName,userPwd,"","","","",0,0,0,"");
-		logger.info("user:"+user.toString());
-		userRepository.save(user);
-		count = 1;
-		return count;
+
+
 	}
 }

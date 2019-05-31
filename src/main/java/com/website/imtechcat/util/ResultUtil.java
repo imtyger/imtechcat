@@ -1,6 +1,6 @@
 package com.website.imtechcat.util;
 
-import com.website.imtechcat.common.Result;
+import com.website.imtechcat.common.ResultBean;
 import com.website.imtechcat.common.ResultEnum;
 
 /**
@@ -13,8 +13,8 @@ import com.website.imtechcat.common.ResultEnum;
 public class ResultUtil {
 
 	//成功带参数
-	public static Result success(Object object){
-		Result result = new Result();
+	public static ResultBean success(Object object){
+		ResultBean result = new ResultBean();
 		result.setCode(ResultEnum.SUCCESS.getCode());
 		result.setMsg(ResultEnum.SUCCESS.getMsg());
 		result.setData(object);
@@ -22,13 +22,13 @@ public class ResultUtil {
 	}
 
 	//成功不带参数
-	public static Result success(){
+	public static ResultBean success(){
 		return success(null);
 	}
 
 	//失败
-	public static Result fail(Integer code,String msg){
-		Result result = new Result();
+	public static ResultBean fail(Integer code,String msg){
+		ResultBean result = new ResultBean();
 		result.setCode(code);
 		result.setMsg(msg);
 		return result;

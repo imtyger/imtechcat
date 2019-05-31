@@ -1,10 +1,8 @@
 package com.website.imtechcat.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.website.imtechcat.repository.UserRepository;
+import com.website.imtechcat.common.ResultBean;
 import com.website.imtechcat.service.UserService;
 import com.website.imtechcat.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,33 +41,34 @@ public class UserController {
 	}
 
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
-	public ResponseEntity<?> loginPost(@RequestParam("username") String userName,
-															@RequestParam("password") String userPwd,
-															ModelMap map){
-		logger.info("--loginPost:"+userName+","+userPwd);
+	public ResponseEntity loginPost(@RequestParam("username") String userName,
+												@RequestParam("password") String userPwd, ModelMap map){
+		ResultBean result = new ResultBean();
 		try{
-			int count = userServiceImpl.login(userName,userPwd);
-			if(count != 1){
-				map.put("code",401);
-				map.put("status","fail");
-				map.put("msg","用户名密码错误");
-				return new ResponseEntity<>("/login", HttpStatus.NOT_FOUND);
+			int user_count = userServiceImpl.login(userName,userPwd);
+			switch(user_count){
+				case 0 :
+					result.setCode(user_count);
+					result.setMsg("用户名不存在");
+					break;
+				case 1:
+					result.setCode(user_count);
+					result.setMsg("密码不正确");
+					break;
+				default:
+					String token = jwtUtil.createToken(userName);
+					map.put("token",token);
+					result.setCode(200);
+					result.setMsg("登录成功");
+					result.setTime(System.currentTimeMillis());
+					result.setData(map);
 			}
-			String token = jwtUtil.createToken(userName);
-			logger.info("创建token:"+token);
-			map.put("expire",jwtUtil.getExpire());
-			map.put("token",token);
-			map.put("userName",userName);
-			map.put("userPwd",userPwd);
-			map.put("code",200);
-			map.put("status","success");
+			return new ResponseEntity(result,HttpStatus.OK);
 		}catch(Exception ex){
-			map.put("code",402);
-			map.put("status","error");
-			map.put("msg",ex.getMessage());
-			return new ResponseEntity<>(map,HttpStatus.EXPECTATION_FAILED);
+			result.setCode(5);
+			result.setMsg(ex.getMessage());
+			return new ResponseEntity(result,HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(map,HttpStatus.OK);
 	}
 
 	@RequestMapping("/register")
@@ -77,5 +76,10 @@ public class UserController {
 		String userName = "admin";
 		String userPwd = "admin";
 		return userServiceImpl.register(userName,userPwd);
+	}
+
+	@RequestMapping("/home")
+	public String home(){
+		return "/home";
 	}
 }
