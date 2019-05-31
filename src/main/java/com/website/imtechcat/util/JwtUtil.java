@@ -18,15 +18,9 @@ import java.util.Date;
  * @Version 1.0
  **/
 @Component
+@Data
 public class JwtUtil {
 	private static Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-
-	// //加密秘钥
-	// public static final String SECRET = "aHR0cHM6Ly9teS5vc2NoaW5hLm5ldC91LzM2ODE4Njg=";
-	// //有效时间
-	// public static final long EXPIRE = 1000 * 6;
-	// //用户凭证
-	// public static final String HEADER = "token";
 
 	@Value("${spring.jwt.secret}")
 	private String secret;
@@ -45,17 +39,6 @@ public class JwtUtil {
 
 	public String getHeader() {
 		return header;
-	}
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
-
-	public void setExpire(String expire) {
-		this.expire = expire;
-	}
-
-	public void setHeader(String header) {
-		this.header = header;
 	}
 
 	//解析token
