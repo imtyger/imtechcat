@@ -32,12 +32,25 @@
                     }
                 },
                 submitHandler:function (form) {
-                    form.submit();
+                    var username = form.username.valueOf();
+                    var password = form.password.valueOf();
+                    console.log(username + "," + password);
                     $.ajax({
-                        success:function (status) {
-                            if(status === "success"){
-                                window.location.href = "/home";
-                            }
+                        type:"post",
+                        dataType:"json",
+                        url:"/api/1.0/login",
+                        contentType:"application/json",
+                        data:{
+                            "username":username,
+                            "password":password
+                        },
+                        success:function (data) {
+                            console.log(data.toString());
+
+                        },
+                        error:function () {
+                            console.log("服务器报错");
+
                         }
                     })
 
