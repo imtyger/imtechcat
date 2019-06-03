@@ -1,15 +1,13 @@
 package com.website.imtechcat.service;
 
-import com.website.imtechcat.entity.User;
+import com.website.imtechcat.entity.UserEntity;
 
 public interface UserService {
 
 	//登录
-	int login(String userName,String userPwd);
+	String login(UserEntity userEntity);
 
 	//注册
-	int register(String userName,String userPwd);
+	String register(UserEntity userEntity);
 
-	//获取用户id
-	String findUserId(User user);
 }

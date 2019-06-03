@@ -31,26 +31,31 @@
                         minlength:"密码长度不能小于5个字符"
                     }
                 },
+
                 submitHandler:function (form) {
-                    var username = form.username.valueOf();
-                    var password = form.password.valueOf();
-                    console.log(username + "," + password);
+                    var username = form.username.value;
+                    var password = form.password.value;
+
                     $.ajax({
                         type:"post",
                         dataType:"json",
-                        url:"/api/1.0/login",
-                        contentType:"application/json",
-                        data:{
-                            "username":username,
-                            "password":password
+                        url:"/register",
+                        contentType:"application/json;charset=UTF-8",
+                        data:JSON.stringify({"username":username,"password":password}),
+                        success:function (data, status,headers,config) {
+                            var code = data.code;
+                            console.log(data);
+                            if(code === 200){
+                                var token = data.data.token;
+                                localStorage.setItem("token",token);
+                                window.location.href = "/home?username="+username;
+                            }else{
+                                alert(data.msg);
+                            }
                         },
-                        success:function (data) {
-                            console.log(data.toString());
+                        error:function (error) {
 
-                        },
-                        error:function () {
-                            console.log("服务器报错");
-
+                            console.log("--error:"+error.responseText);
                         }
                     })
 
@@ -65,7 +70,7 @@
 <body>
         <div class="row">
             <div class="col-sm-12">
-                <form method="post" action="/api/1.0/login" id="frm">
+                <form method="post" id="frm">
                     <h4>登录个人书签管理后台</h4>
                     <input type="text" class="form-control" name="username" id="username" placeholder="用户名"/>
                     <input type="password" class="form-control" name="password" id="password" placeholder="密码"/>

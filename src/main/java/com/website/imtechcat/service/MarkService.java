@@ -1,12 +1,12 @@
 package com.website.imtechcat.service;
 
-import com.website.imtechcat.entity.Mark;
+import com.website.imtechcat.entity.MarkEntity;
 
 import java.util.List;
 
 public interface MarkService {
 
-	List<Mark> findMarksByUserId(String userId);
+	List<MarkEntity> findMarkEntitiesByUserId(String userId);
 
-	List<Mark> findMarksByMarkName(String markName);
+	List<MarkEntity> findMarkEntitiesByMarkName(String markName);
 }

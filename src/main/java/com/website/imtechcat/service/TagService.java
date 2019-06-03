@@ -1,11 +1,13 @@
 package com.website.imtechcat.service;
 
-import com.website.imtechcat.entity.Tag;
+import com.website.imtechcat.entity.TagEntity;
 
 import java.util.List;
 
 public interface TagService {
 
-	List<Tag> findTags();
+	List<TagEntity>  findTagEntitiesByUserId(String userId);
+
+	int newTag(List<TagEntity> tagEntities);
 
 }

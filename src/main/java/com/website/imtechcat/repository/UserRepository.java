@@ -1,22 +1,20 @@
 package com.website.imtechcat.repository;
 
-import com.website.imtechcat.entity.User;
+import com.website.imtechcat.entity.UserEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends MongoRepository<User,String> {
+public interface UserRepository extends MongoRepository<UserEntity, String> {
 
 	//判断用户名是否存在
-	User findUserByUserName(String userName);
+	UserEntity findUserEntityByUsername(String username);
 
 	//判断手机号是否存在
-	int findUserByPhoneNum(String phoneNum);
+	boolean findByUserphone(String userphone);
 
 	//判断邮箱是否存在
-	int findUserByEmail(String email);
+	boolean findByEmail(String email);
 
-	//获取用户id
-	String findById(User user);
 
 }

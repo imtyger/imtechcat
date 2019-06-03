@@ -1,7 +1,6 @@
 package com.website.imtechcat.controller;
 
-import com.website.imtechcat.entity.Tag;
-import com.website.imtechcat.repository.TagRepository;
+import com.website.imtechcat.entity.TagEntity;
 import com.website.imtechcat.service.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -28,20 +27,16 @@ public class TagController {
 	@Resource
 	private TagService tagServiceImpl;
 
-	@RequestMapping("/{userName}/tags/tagslist")
-	public List<Tag> findTags(){
-		return tagServiceImpl.findTags();
+	@RequestMapping("/tags/tags")
+	public List<TagEntity> findTags(String userId){
+		return tagServiceImpl.findTagEntitiesByUserId(userId);
 	}
 
-	@RequestMapping("/{userName}/tags/addtags")
-	public int addTags(List<Tag> tagList){
-		return 0;
+	@RequestMapping("/tags/newtags")
+	public int newTags(List<TagEntity> tagEntities){
+		return tagServiceImpl.newTag(tagEntities);
 	}
 
-	@RequestMapping("/{userName}/tags/deltags")
-	public int delTags(List<Tag> tagList){
-		return 0;
-	}
 
 
 }

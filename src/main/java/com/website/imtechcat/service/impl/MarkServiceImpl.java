@@ -1,6 +1,6 @@
 package com.website.imtechcat.service.impl;
 
-import com.website.imtechcat.entity.Mark;
+import com.website.imtechcat.entity.MarkEntity;
 import com.website.imtechcat.repository.MarkRepository;
 import com.website.imtechcat.service.MarkService;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,12 @@ public class MarkServiceImpl implements MarkService {
 	private MarkRepository markRepository;
 
 	@Override
-	public List<Mark> findMarksByUserId(String userId) {
-		return markRepository.findMarksByUserId(userId);
+	public List<MarkEntity> findMarkEntitiesByUserId(String userId) {
+		return markRepository.findMarkEntitiesByUserId(userId);
 	}
 
 	@Override
-	public List<Mark> findMarksByMarkName(String markName) {
-		return markRepository.findMarksByMarkName(markName);
+	public List<MarkEntity> findMarkEntitiesByMarkName(String markName) {
+		return markRepository.findMarkEntitiesByMarkName(markName);
 	}
 }

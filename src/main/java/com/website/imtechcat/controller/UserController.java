@@ -1,6 +1,7 @@
 package com.website.imtechcat.controller;
 
-import com.website.imtechcat.common.ResultBean;
+import com.website.imtechcat.common.Result;
+import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.service.UserService;
 import com.website.imtechcat.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @ClassName UserController
@@ -35,51 +36,46 @@ public class UserController {
 	@Resource
 	private JwtUtil jwtUtil;
 
+
 	@RequestMapping(value={"/"},method = RequestMethod.GET)
 	public String login(){
 		return "/login";
 	}
 
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
-	public ResponseEntity loginPost(@RequestParam("username") String userName,
-												@RequestParam("password") String userPwd, ModelMap map){
-		ResultBean result = new ResultBean();
+	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity){
 		try{
-			int user_count = userServiceImpl.login(userName,userPwd);
-			switch(user_count){
-				case 0 :
-					result.setCode(user_count);
-					result.setMsg("用户名不存在");
-					break;
-				case 1:
-					result.setCode(user_count);
-					result.setMsg("密码不正确");
-					break;
-				default:
-					String token = jwtUtil.createToken(userName);
-					map.put("token",token);
-					result.setCode(200);
-					result.setMsg("登录成功");
-					result.setTime(System.currentTimeMillis());
-					result.setData(map);
+			String id = userServiceImpl.login(userEntity);
+			if(id == null){
+				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
 			}
-			return new ResponseEntity(result,HttpStatus.OK);
+
+			String token = jwtUtil.createToken(id);
+			Map map = new HashMap();
+			map.put("token",token);
+			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+
 		}catch(Exception ex){
-			result.setCode(5);
-			result.setMsg(ex.getMessage());
-			return new ResponseEntity(result,HttpStatus.NOT_FOUND);
+			String msg = ex.getCause().getMessage();
+			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping("/register")
-	public int register(){
-		String userName = "admin";
-		String userPwd = "admin";
-		return userServiceImpl.register(userName,userPwd);
+	@RequestMapping(value="/register",method = RequestMethod.POST)
+	public ResponseEntity<Result> register(@RequestBody UserEntity userEntity){
+		try{
+			String id = userServiceImpl.register(userEntity);
+			if(id == null){
+				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
+			}
+			String token = jwtUtil.createToken(id);
+			Map map = new HashMap();
+			map.put("token",token);
+			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+		}catch(Exception ex){
+			String msg = ex.getCause().getMessage();
+			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
+		}
 	}
 
-	@RequestMapping("/home")
-	public String home(){
-		return "/home";
-	}
 }

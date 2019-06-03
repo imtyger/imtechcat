@@ -2,27 +2,28 @@ package com.website.imtechcat.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * @ClassName Mark
+ * @ClassName TagEntity
  * @Description TODO
  * @Author Lenovo
- * @Date 2019/5/27 14:17
+ * @Date 2019/6/3 14:51
  * @Version 1.0
  **/
-@Document(collection = "marks")
+@Document(collection = "tags")
 @Data
 @AllArgsConstructor
-public class Mark {
+@NoArgsConstructor
+public class TagEntity {
+
 	@Id
 	private String id;
 	private String userId;
-	private String userName;
-	private String markName;
-	private String markDesc;
-	private String markLink;
+	private String tagName;
+	private String tagDesc;
 	private long createTime;
-
+	private long lastUpdateTime;
 }

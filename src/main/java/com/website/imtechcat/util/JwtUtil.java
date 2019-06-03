@@ -5,7 +5,6 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -45,7 +44,7 @@ public class JwtUtil {
 	public Claims parseToken(String jsonWebToken){
 		try{
 			Claims claims = Jwts.parser().setSigningKey(getSecret()).parseClaimsJws(jsonWebToken).getBody();
-			logger.info("从token中解析到的username:"+claims.toString());
+			logger.info("从token中解析到的userid:"+claims.toString());
 			return claims;
 		}catch(Exception ex) {
 			logger.error("获取token失败",ex);
@@ -54,13 +53,12 @@ public class JwtUtil {
 	}
 
 	//生成token
-	public String createToken(String userName){
-		logger.info("header="+getHeader()+",expire="+getExpire()+",secret="+getSecret());
+	public String createToken(String userId){
 		Date date = new Date();
 		Date expireDate = new Date(date.getTime()+ Long.parseLong(getExpire()) );
 		JwtBuilder builder = Jwts.builder()
 				.setHeaderParam("typ","JWT")
-				.setSubject(userName)
+				.setSubject(userId)
 				.setIssuedAt(date)
 				.setExpiration(expireDate)
 				.signWith(SignatureAlgorithm.HS256,getSecret());

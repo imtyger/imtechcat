@@ -1,6 +1,6 @@
 package com.website.imtechcat.service.impl;
 
-import com.website.imtechcat.entity.Tag;
+import com.website.imtechcat.entity.TagEntity;
 import com.website.imtechcat.repository.TagRepository;
 import com.website.imtechcat.service.TagService;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,13 @@ public class TagServiceImpl implements TagService {
 	private TagRepository tagRepository;
 
 	@Override
-	public List<Tag> findTags() {
-		return tagRepository.findTagsByTagNameIsNotNull();
+	public List<TagEntity> findTagEntitiesByUserId(String userId) {
+		return tagRepository.findTagEntitiesByUserId(userId);
+	}
+
+	@Override
+	public int newTag(List<TagEntity> tagEntities) {
+		return tagRepository.insert(tagEntities).size();
 	}
 
 }

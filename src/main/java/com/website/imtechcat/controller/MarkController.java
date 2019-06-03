@@ -1,9 +1,7 @@
 package com.website.imtechcat.controller;
 
-import com.website.imtechcat.entity.Mark;
-import com.website.imtechcat.entity.User;
+import com.website.imtechcat.entity.MarkEntity;
 import com.website.imtechcat.service.MarkService;
-import com.website.imtechcat.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +27,14 @@ public class MarkController {
 	@Resource
 	private MarkService markServiceImpl;
 
-	@Resource
-	private UserService userServiceImpl;
-
-	@RequestMapping("/{userName}/marks/marklistbyuser")
-	public List<Mark> findMarksByUser(User user){
-		String userId = userServiceImpl.findUserId(user);
-		return markServiceImpl.findMarksByUserId(userId);
+	@RequestMapping("/marks/marks")
+	public List<MarkEntity> findMarkEntitiesByUserId(String userId){
+		return markServiceImpl.findMarkEntitiesByUserId(userId);
 	}
 
-	@RequestMapping("/{userName}/marks/marklistbymarkname")
-	public List<Mark> findMarksByMarkName(String markName){
-		return markServiceImpl.findMarksByMarkName(markName);
+	@RequestMapping("/marks/marksbymarkname")
+	public List<MarkEntity> findMarkEntitiesByMarkName(String markName){
+		return markServiceImpl.findMarkEntitiesByMarkName(markName);
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.website.imtechcat.service.impl;
 
-import com.website.imtechcat.entity.User;
+import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.repository.UserRepository;
 import com.website.imtechcat.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,46 +26,33 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Override
-	public String findUserId(User user){
-		return userRepository.findById(user.getId()).toString();
-	}
 
 	@Override
-	public int login(String userName, String userPwd) {
-		logger.info("-------------------------");
-		User user = userRepository.findUserByUserName(userName);
-		logger.info("user:"+user.toString());
-		if(user == null){
-			logger.info("User : " + userName + " not exist.");
+	public String login(UserEntity user) {
+		UserEntity userEntity = userRepository.findUserEntityByUsername(user.getUsername());
+		if(userEntity == null){
+			logger.info("UserEntity : " + user + " not exist.");
 			//用户不存在时返回0
-			return 0;
+			return null;
 		}
 		//这里需要做解密
-		String pwd = user.getUserPwd();
-		if(!userPwd.trim().equals(pwd)){
-			//密码错误返回1
-			return 1;
+		if(!userEntity.getPassword().trim().equals(user.getPassword())){
+			//密码错误返回0
+			return null;
 		}
-		//密码正确成功返回2
-		return 2;
+		//密码正确成功返回1
+		return userEntity.getId();
 	}
 
 	@Override
-	public int register(String userName, String userPwd) {
+	public String register(UserEntity userEntity) {
 		try{
-			//此处需要创建用户id
-			User user = new User("",userName,userPwd,"","","","",0,0,0,"");
-			logger.info("register user:"+user.toString());
-			userRepository.save(user);
+			UserEntity user = userRepository.save(userEntity);
 			//创建成功返回1
-			return 1;
+			return user.getId();
 		}catch (Exception ex){
-			logger.error("register user :" + userName + " fail.",ex.getMessage());
-			//失败返回0
-			return 0;
+			logger.error("register user :" + userEntity + " fail.",ex.getMessage());
 		}
-
-
+		return null;
 	}
 }
