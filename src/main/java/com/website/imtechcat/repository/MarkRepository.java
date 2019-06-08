@@ -13,7 +13,7 @@ public interface MarkRepository extends MongoRepository<MarkEntity,String> {
 	List<MarkEntity> findMarkEntitiesByUserId(String userId);
 
 	//获取指定书签名称列表
-	List<MarkEntity> findMarkEntitiesByMarkName(String markName);
+	List<MarkEntity> findMarkEntitiesByUserIdAndMarkName(String userId, String markName);
 
 
 }

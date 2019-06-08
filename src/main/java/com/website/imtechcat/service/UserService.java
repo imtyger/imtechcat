@@ -10,4 +10,10 @@ public interface UserService {
 	//注册
 	String register(UserEntity userEntity);
 
+	//获取用户
+	UserEntity findUserEntityById(String id);
+
+	//更新用户信息
+	String modifyUserEntity(UserEntity userEntity);
+
 }

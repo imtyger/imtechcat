@@ -39,7 +39,7 @@
                     $.ajax({
                         type:"post",
                         dataType:"json",
-                        url:"/register",
+                        url:"/api/1.0/login",
                         contentType:"application/json;charset=UTF-8",
                         data:JSON.stringify({"username":username,"password":password}),
                         success:function (data, status,headers,config) {
@@ -48,7 +48,7 @@
                             if(code === 200){
                                 var token = data.data.token;
                                 localStorage.setItem("token",token);
-                                window.location.href = "/home?username="+username;
+                                window.location.href = "/home";
                             }else{
                                 alert(data.msg);
                             }

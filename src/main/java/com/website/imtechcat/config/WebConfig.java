@@ -4,6 +4,7 @@ import com.website.imtechcat.interceptor.JwtInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 
@@ -14,8 +15,8 @@ import javax.annotation.Resource;
  * @Date 2019/5/29 14:36
  * @Version 1.0
  **/
-
-public class WebConfig extends WebMvcConfigurationSupport {
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
 
 	@Resource
 	private JwtInterceptor interceptor;
@@ -23,7 +24,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry){
 		//添加拦截器
-		registry.addInterceptor(interceptor);
+		registry.addInterceptor(interceptor).addPathPatterns("/**")
+		.excludePathPatterns("/","/login");
+		WebMvcConfigurer.super.addInterceptors(registry);
 	}
 
 

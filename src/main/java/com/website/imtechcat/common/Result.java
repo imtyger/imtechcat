@@ -62,4 +62,13 @@ public class Result<T> implements Serializable {
 	public static <T> Result<T> fail(){
 		return new Result<>(ResultCode.FAILED.getCode(),ResultCode.FAILED.getMsg(),null);
 	}
+
+	//验证失败返回
+	public static <T> Result<T> unAuth(String msg){
+		return new Result<>(ResultCode.UNAUTHORIZED.getCode(),msg,null);
+	}
+
+	public static <T> Result<T> unAuth(){
+		return new Result<>(ResultCode.UNAUTHORIZED.getCode(),ResultCode.UNAUTHORIZED.getMsg(),null);
+	}
 }

@@ -24,6 +24,6 @@ public class TagEntity {
 	private String userId;
 	private String tagName;
 	private String tagDesc;
-	private long createTime;
-	private long lastUpdateTime;
+	private long createdAt;
+	private long lastUpdatedAt;
 }

@@ -29,6 +29,6 @@ public class MarkEntity {
 	private String markDesc;
 	private String markLink;
 	private List<HashMap<String,String>> tags;
-	private long createTime;
-	private long updateTime;
+	private long createdAt;
+	private long lastUpdatedAt;
 }

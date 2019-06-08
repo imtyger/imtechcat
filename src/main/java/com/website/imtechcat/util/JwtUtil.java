@@ -43,7 +43,9 @@ public class JwtUtil {
 	//解析token
 	public Claims parseToken(String jsonWebToken){
 		try{
-			Claims claims = Jwts.parser().setSigningKey(getSecret()).parseClaimsJws(jsonWebToken).getBody();
+			Claims claims = Jwts.parser()
+					.setSigningKey(getSecret())
+					.parseClaimsJws(jsonWebToken).getBody();
 			logger.info("从token中解析到的userid:"+claims.toString());
 			return claims;
 		}catch(Exception ex) {

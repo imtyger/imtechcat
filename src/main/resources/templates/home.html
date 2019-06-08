@@ -1,10 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>主页</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/messages_zh.js"></script>
+    <script>
+        var token = localStorage.getItem("token");
+        $.ajax({
+            type:"get",
+            url:"/api/1.0/account",
+            beforeSend: function(request) {
+                request.setRequestHeader("Authorization", "Bearer " + token);
+            },
+            success:function (result) {
+                if(result.code !== 200){
+                    window.location.href = "/";
+                }
+                console.log(result);
+            }
+        });
+    </script>
 </head>
 <body>
-<H1>Hello ${userName} 验证通过!</H1>
+<div>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand active" href="/home" >主页</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="/home/tags">Tags</a></li>
+                    <li><a href="/home/marks">Marks</a></li>
+                </ul>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/">退出</a></li>
+            </ul>
+        </div>
+    </nav>
+</div>
 </body>
 </html>

@@ -10,6 +10,8 @@ public interface UserRepository extends MongoRepository<UserEntity, String> {
 	//判断用户名是否存在
 	UserEntity findUserEntityByUsername(String username);
 
+	UserEntity findUserEntityById(String id);
+
 	//判断手机号是否存在
 	boolean findByUserphone(String userphone);
 

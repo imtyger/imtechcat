@@ -8,5 +8,7 @@ public interface MarkService {
 
 	List<MarkEntity> findMarkEntitiesByUserId(String userId);
 
-	List<MarkEntity> findMarkEntitiesByMarkName(String markName);
+	List<MarkEntity> findMarkEntitiesByUserIdAndMarkName(String userId, String markName);
+
+	int newMarks(List<MarkEntity> markEntities);
 }

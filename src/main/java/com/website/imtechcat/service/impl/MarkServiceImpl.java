@@ -27,7 +27,12 @@ public class MarkServiceImpl implements MarkService {
 	}
 
 	@Override
-	public List<MarkEntity> findMarkEntitiesByMarkName(String markName) {
-		return markRepository.findMarkEntitiesByMarkName(markName);
+	public List<MarkEntity> findMarkEntitiesByUserIdAndMarkName(String userId, String markName) {
+		return markRepository.findMarkEntitiesByUserIdAndMarkName(userId,markName);
+	}
+
+	@Override
+	public int newMarks(List<MarkEntity> markEntities) {
+		return markRepository.insert(markEntities).size();
 	}
 }
