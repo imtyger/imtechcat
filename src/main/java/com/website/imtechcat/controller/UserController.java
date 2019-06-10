@@ -50,19 +50,20 @@ public class UserController {
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
 	@PassToken
 	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity,HttpServletRequest request){
-
 		logger.info("==================loginPost");
 		try{
-			//最近登录ip
 			userEntity.setLastLoginIp(IpAddressUtil.getIpAddr(request));
-			logger.info("==================userEntity.LastLoginIp:" + userEntity.getLastLoginIp());
-			String id = userServiceImpl.login(userEntity);
-			if(StringUtils.isEmpty(id)){
-				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
+
+			UserEntity user = userServiceImpl.login(userEntity);
+			if(user == null){
+				return new ResponseEntity<>(Result.unValid(),HttpStatus.OK);
 			}
-			logger.info("============id:"+id);
-			String token = jwtUtil.createToken(id);
-			logger.info("============token:"+token);
+
+			String token = jwtUtil.createToken(user);
+			if(null == token || StringUtils.isEmpty(token)){
+				return new ResponseEntity<>(Result.unAuth(),HttpStatus.OK);
+			}
+
 			Map map = new HashMap();
 			map.put("token",token);
 			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
@@ -85,7 +86,8 @@ public class UserController {
 				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
 			}
 
-			String token = jwtUtil.createToken(id);
+			String token = jwtUtil.createToken(userEntity);
+
 			Map map = new HashMap();
 			map.put("token",token);
 			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
@@ -101,5 +103,6 @@ public class UserController {
 		logger.info("===================error===================");
 		return "error";
 	}
+
 
 }

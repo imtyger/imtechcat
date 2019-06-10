@@ -3,6 +3,7 @@ package com.website.imtechcat.service.impl;
 import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.repository.UserRepository;
 import com.website.imtechcat.service.UserService;
+import com.website.imtechcat.util.IpAddressUtil;
 import com.website.imtechcat.util.Sha256Util;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -29,7 +30,8 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public String login(UserEntity userEntity) {
+	public UserEntity login(UserEntity userEntity) {
+
 		UserEntity user = userRepository.findUserEntityByUsername(userEntity.getUsername());
 
 		//用户不存在
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService {
 			logger.error(userEntity.getUsername() + " not exist.");
 			return null;
 		}
+
 		//将前端传的密码进行sha256加密 再将其和数据库中取出的密码进行比对 是否一致
 		String newPwd = Sha256Util.getSHA256(userEntity.getPassword());
 		//密码错误
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
 		user.setLastLoginTime(System.currentTimeMillis());
 		//更新最近登录ip
 		user.setLastLoginIp(userEntity.getLastLoginIp());
-		return 	userRepository.save(user).getId();
+		return 	userRepository.save(user);
 	}
 
 	@Override

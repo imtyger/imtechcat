@@ -5,7 +5,7 @@ import com.website.imtechcat.entity.UserEntity;
 public interface UserService {
 
 	//登录
-	String login(UserEntity userEntity);
+	UserEntity login(UserEntity userEntity);
 
 	//注册
 	String register(UserEntity userEntity);

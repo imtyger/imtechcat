@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>主页</title>
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="/js/messages_zh.js"></script>
@@ -22,9 +20,10 @@
                 if(result.code !== 200){
                     window.location.href = "/";
                 }
-                console.log(result);
+                localStorage.setItem("user",result.data);
             }
         });
+
     </script>
 </head>
 <body>
@@ -41,7 +40,8 @@
                 </ul>
             </div>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/">退出</a></li>
+                <li><a href="javascript:void(0);" >用户信息</a></li>
+                <li><a href="/logout">退出</a></li>
             </ul>
         </div>
     </nav>

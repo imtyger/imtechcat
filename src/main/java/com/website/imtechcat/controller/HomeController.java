@@ -14,12 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -52,14 +54,11 @@ public class HomeController {
 		return "/home";
 	}
 
-	@RequestMapping(value = {"/api/1.0/account"},method = RequestMethod.GET)
+	@RequestMapping(value = {"/api/1.0/account"},method = {RequestMethod.GET,RequestMethod.POST})
 	public ResponseEntity<Result> account(HttpServletRequest request){
-		logger.info("==============account==================");
-		String token = request.getHeader("Authorization");
-		token = token.split(" ")[1];
-		Claims claims = jwtUtil.parseToken(token);
-		if(claims != null){
-			UserEntity userEntity = userServiceImpl.findUserEntityById(claims.getSubject());
+		String userId = (String) request.getAttribute("userId");
+		if(!StringUtils.isEmpty(userId)){
+			UserEntity userEntity = userServiceImpl.findUserEntityById(userId);
 			return new ResponseEntity<>(Result.success(userEntity), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(Result.unAuth(),HttpStatus.OK);
@@ -69,6 +68,15 @@ public class HomeController {
 	public List<TagEntity> homeTags(@RequestBody UserEntity userEntity){
 		List<TagEntity> list = tagServiceImpl.findTagEntitiesByUserId(userEntity.getId());
 		return list;
+	}
+
+	@RequestMapping(value={"/logout"},method = {RequestMethod.GET,RequestMethod.POST})
+	@PassToken
+	public String logout(HttpServletRequest request){
+		if(request.getAttribute("Authorization") != null){
+			request.removeAttribute("Authorization");
+		}
+		return "/login";
 	}
 
 }
