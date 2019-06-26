@@ -1,5 +1,7 @@
 package com.website.imtechcat.common.exception;
 
+import io.swagger.models.auth.In;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,24 +12,16 @@ import lombok.Setter;
  * @Date 2019/6/10 19:14
  * @Version 1.0
  **/
-@Getter
-@Setter
+@Data
 public class NullOrEmptyException extends RuntimeException{
 
 
-	private String message;
 	private Integer code;
-
-	public NullOrEmptyException(){
-		setMessage("Parameter is null or empty");
-	}
-
-	public NullOrEmptyException(String message){
-		this.message = message;
-	}
+	private String message;
 
 	public NullOrEmptyException(Integer code,String message){
 		this.code = code;
 		this.message = message;
 	}
+
 }

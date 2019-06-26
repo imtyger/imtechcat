@@ -17,8 +17,10 @@
                 request.setRequestHeader("Authorization", "Bearer " + token);
             },
             success:function (result) {
+                debugger;
                 if(result.code !== 200){
                     window.location.href = "/";
+                    alert(result.msg);
                 }
                 localStorage.setItem("user",result.data);
             }
@@ -37,6 +39,7 @@
                 <ul class="nav navbar-nav navbar-left">
                     <li><a href="/home/tags">Tags</a></li>
                     <li><a href="/home/marks">Marks</a></li>
+                    <li><a href="/home/search">Search</a></li>
                 </ul>
             </div>
             <ul class="nav navbar-nav navbar-right">

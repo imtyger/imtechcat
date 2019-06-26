@@ -34,6 +34,11 @@ public class Result<T> implements Serializable {
 		return new Result<>(ResultCode.SUCCESS.getCode(), msg, data);
 	}
 
+	//错误
+	public static <T> Result<T> error(Integer code,String msg,T data){
+		return new Result<>(code,msg,data);
+	}
+
 	//失败
 	public static <T> Result<T> fail(){
 		return new Result<>(ResultCode.FAILED.getCode(),ResultCode.FAILED.getMsg(),null);
@@ -45,6 +50,19 @@ public class Result<T> implements Serializable {
 	public static <T> Result<T> fail(String msg,T data){
 		return new Result<>(ResultCode.FAILED.getCode(),msg,data);
 	}
+
+	//用户名密码错误
+	public static <T> Result<T> userNotFound(){
+		return new Result<>(ResultCode.USERNOTFOUND.getCode(),ResultCode.USERNOTFOUND.getMsg(),null);
+	}
+	public static <T> Result<T> userNotFound(String msg){
+		return new Result<>(ResultCode.USERNOTFOUND.getCode(),msg,null);
+	}
+
+	public static <T> Result<T> userNotFound(String msg,T data){
+		return new Result<>(ResultCode.USERNOTFOUND.getCode(),msg,data);
+	}
+
 
 	//授权失败
 	public static <T> Result<T> unAuth(){

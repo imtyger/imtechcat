@@ -1,14 +1,13 @@
 package com.website.imtechcat.controller;
 
+import com.website.imtechcat.common.Constant;
 import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.service.UserService;
 import com.website.imtechcat.util.IpAddressUtil;
-import com.website.imtechcat.util.JwtUtil;
+import com.website.imtechcat.util.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,13 +31,14 @@ import java.util.Map;
 @RequestMapping("/")
 public class UserController {
 
-	private Logger logger = LoggerFactory.getLogger(UserController.class);
-
 	@Resource
 	private UserService userServiceImpl;
 
 	@Resource
-	private JwtUtil jwtUtil;
+	private JwtTokenUtil jwtTokenUtil;
+
+	@Resource
+	private Constant constant;
 
 	@RequestMapping(value={"/","/login"},method = RequestMethod.GET)
 	@PassToken
@@ -50,26 +50,26 @@ public class UserController {
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
 	@PassToken
 	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity,HttpServletRequest request){
-		logger.info("==================loginPost");
+		log.info("==================loginPost");
 		try{
 			userEntity.setLastLoginIp(IpAddressUtil.getIpAddr(request));
 
 			UserEntity user = userServiceImpl.login(userEntity);
 			if(user == null){
-				return new ResponseEntity<>(Result.unValid(),HttpStatus.OK);
+				return new ResponseEntity<>(Result.userNotFound(),HttpStatus.OK);
 			}
 
-			String token = jwtUtil.createToken(user);
+			String token = jwtTokenUtil.createToken(user);
 			if(null == token || StringUtils.isEmpty(token)){
 				return new ResponseEntity<>(Result.unAuth(),HttpStatus.OK);
 			}
 
 			Map map = new HashMap();
-			map.put("token",token);
+			map.put(constant.getToken(),token);
 			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
 
 		}catch(Exception ex){
-			String msg = ex.getCause().getMessage();
+			String msg = ex.getMessage();
 			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
 		}
 	}
@@ -86,10 +86,10 @@ public class UserController {
 				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
 			}
 
-			String token = jwtUtil.createToken(userEntity);
+			String token = jwtTokenUtil.createToken(userEntity);
 
 			Map map = new HashMap();
-			map.put("token",token);
+			map.put(constant.getToken(),token);
 			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
 		}catch(Exception ex){
 			String msg = ex.getCause().getMessage();
@@ -100,7 +100,7 @@ public class UserController {
 	@RequestMapping(value={"/error"},method = {RequestMethod.GET,RequestMethod.POST})
 	@PassToken
 	public String error(HttpServletRequest request){
-		logger.info("===================error===================");
+		log.info("===================error===================");
 		return "error";
 	}
 

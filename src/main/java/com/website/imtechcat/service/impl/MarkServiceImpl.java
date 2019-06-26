@@ -32,7 +32,8 @@ public class MarkServiceImpl implements MarkService {
 	}
 
 	@Override
-	public int newMarks(List<MarkEntity> markEntities) {
-		return markRepository.insert(markEntities).size();
+	public MarkEntity newMarks(MarkEntity markEntity) {
+
+		return markRepository.insert(markEntity);
 	}
 }

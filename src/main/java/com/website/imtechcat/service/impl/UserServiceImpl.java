@@ -3,11 +3,8 @@ package com.website.imtechcat.service.impl;
 import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.repository.UserRepository;
 import com.website.imtechcat.service.UserService;
-import com.website.imtechcat.util.IpAddressUtil;
 import com.website.imtechcat.util.Sha256Util;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +20,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-	private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
 	private UserRepository userRepository;
@@ -36,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
 		//用户不存在
 		if(user == null){
-			logger.error(userEntity.getUsername() + " not exist.");
+			log.error(userEntity.getUsername() + " not exist.");
 			return null;
 		}
 
@@ -44,7 +40,7 @@ public class UserServiceImpl implements UserService {
 		String newPwd = Sha256Util.getSHA256(userEntity.getPassword());
 		//密码错误
 		if(newPwd == null || !user.getPassword().trim().equals(newPwd)){
-			logger.error("password error.");
+			log.error("password error.");
 			return null;
 		}
 		//更新最近登录时间
@@ -60,7 +56,7 @@ public class UserServiceImpl implements UserService {
 			//判断用户名是否重复
 			UserEntity user = userRepository.findUserEntityByUsername(userEntity.getUsername());
 			if(user != null){
-				logger.info("username :" + userEntity.getUsername() + " already exist.");
+				log.info("username :" + userEntity.getUsername() + " already exist.");
 				return null;
 			}
 
@@ -75,7 +71,7 @@ public class UserServiceImpl implements UserService {
 			//创建成功返回id
 			return userRepository.insert(userEntity).getId();
 		}catch (Exception ex){
-			logger.error("register user :" + userEntity + " fail.",ex.getMessage());
+			log.error("register user :" + userEntity + " fail.",ex.getMessage());
 		}
 		return null;
 	}

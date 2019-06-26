@@ -1,9 +1,11 @@
 package com.website.imtechcat.interceptor;
 
+import com.website.imtechcat.common.Constant;
+import com.website.imtechcat.common.ResultCode;
 import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.common.exception.NullOrEmptyException;
 import com.website.imtechcat.common.exception.TokenNotFoundException;
-import com.website.imtechcat.util.JwtUtil;
+import com.website.imtechcat.util.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -30,12 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class JwtInterceptor extends HandlerInterceptorAdapter {
 
-	private Logger logger = LoggerFactory.getLogger(JwtInterceptor.class);
+	@Resource
+	private JwtTokenUtil jwtTokenUtil;
 
 	@Resource
-	private JwtUtil jwtUtil;
-
-	public static final String USER_KEY = "userId";
+	private Constant constant;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -48,38 +49,42 @@ public class JwtInterceptor extends HandlerInterceptorAdapter {
 			return true;
 		}
 
-		logger.info("####################################");
-		logger.info("路由： " + request.getRequestURI());
-		logger.info("####################################");
+		log.info("####################################");
+		log.info("路由： " + request.getRequestURI());
+		log.info("####################################");
 
 		//通过request获取请求token信息
-		String authorization = request.getHeader("Authorization");
-		logger.info("===authorization===" + authorization);
+		String authorization = request.getHeader(constant.getHeader());
 
 		//判断请求头信息是否为空，
-		if(authorization == null || StringUtils.isEmpty(authorization)){
-			throw new NullOrEmptyException("Header:Authorization is null or empty.");
+		if(authorization == null || StringUtils.isEmpty(authorization) || authorization.trim().equals(constant.getNullStr())){
+			//errorMsg = "Header:Authorization is null or empty.";
+			throw new NullOrEmptyException(ResultCode.UNAUTHORIZED.getCode(),ResultCode.UNAUTHORIZED.getMsg());
 		}
 
 		//判断是否以Bearer 开头
-		if(!authorization.startsWith("Bearer")) {
-			throw new TokenNotFoundException("Authorization:Bearer not found.");
+		if(!authorization.startsWith(constant.getPrefix())) {
+			throw new TokenNotFoundException(ResultCode.VALIDATE_FAILED.getCode(),"Authorization:Bearer not found.");
 		}
 
-		//获取token
-		String token = authorization.replace("Bearer ","");
-		Claims claims = jwtUtil.parseToken(token);
+		//取出token 判断是否为空或null
+		String token = authorization.replace(constant.getPrefix() + " ","");
+		if(StringUtils.isEmpty(token) || token == null || token.trim().equals(constant.getNullStr())){
+			throw new TokenNotFoundException(ResultCode.VALIDATE_FAILED.getCode(),"token is empty or null.");
+		}
+
+		//解析token 判断claims是否为空
+		Claims claims = jwtTokenUtil.parseToken(token);
 		if(claims == null || claims.isEmpty() || claims.getSubject().isEmpty()){
-			throw new TokenNotFoundException("parse token failed, claims not found.");
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"parse token failed, claims not found.");
 		}
 
-		//判断claims是否为空 判断token是否失效
-		boolean b = jwtUtil.isTokenExpired(token);
+		//判断token是否失效
+		boolean b = jwtTokenUtil.isTokenExpired(token);
 		if(b){
-			logger.info("======="+b);
-			throw new TokenNotFoundException("token expired.");
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token expired.");
 		}
-		request.setAttribute(USER_KEY,claims.getSubject());
+		request.setAttribute(constant.getUserKey(),claims.getSubject());
 
 		return true;
 	}

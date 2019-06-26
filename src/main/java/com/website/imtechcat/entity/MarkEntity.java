@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName MarkEntity
@@ -28,7 +29,7 @@ public class MarkEntity {
 	private String markName;
 	private String markDesc;
 	private String markLink;
-	private List<HashMap<String,String>> tags;
+	private List<Map> tags;
 	private long createdAt;
 	private long lastUpdatedAt;
 }

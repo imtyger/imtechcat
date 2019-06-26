@@ -1,13 +1,14 @@
 package com.website.imtechcat.common.advice;
 
+import com.alibaba.fastjson.JSONObject;
 import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.ResultCode;
 import com.website.imtechcat.common.exception.IllegalPropertiesException;
 import com.website.imtechcat.common.exception.NullOrEmptyException;
 import com.website.imtechcat.common.exception.TokenNotFoundException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,62 +20,42 @@ import javax.servlet.http.HttpServletRequest;
  * @Version 1.0
  **/
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionAdvice {
 
-
-	@ExceptionHandler(Exception.class)
+	@ExceptionHandler(value = RuntimeException.class)
 	@ResponseBody
-	public Result<String> exceptionHandler(HttpServletRequest request, Exception ex){
-		return handleErrorInfo(request,ex.getMessage(),ex);
-	}
-
-
-
-	@ExceptionHandler(TokenNotFoundException.class)
-	@ResponseBody
-	public Result<String> tokenNotFoundExceptionHandler(HttpServletRequest request, TokenNotFoundException ex){
-		if(ex.getCode() == null){
-			return handleErrorInfo(request,ex.getMessage(),ex);
+	public Result<Object> customExceptionHandler(HttpServletRequest request,Exception ex){
+		Result<Object> result = new Result();
+		if( ex instanceof TokenNotFoundException){
+			TokenNotFoundException tokenException = (TokenNotFoundException) ex;
+			result.setCode(tokenException.getCode());
+			result.setMsg(tokenException.getMessage());
+		} else if( ex instanceof NullOrEmptyException){
+			NullOrEmptyException nullOrEmptyExcep = (NullOrEmptyException) ex;
+			result.setCode(nullOrEmptyExcep.getCode());
+			result.setMsg(nullOrEmptyExcep.getMessage());
+		} else if( ex instanceof IllegalPropertiesException) {
+			IllegalPropertiesException illegalPropException = (IllegalPropertiesException) ex;
+			result.setCode(illegalPropException.getCode());
+			result.setMsg(illegalPropException.getMessage());
+		} else {
+			result.setCode(ResultCode.EXCEPTION.getCode());
+			String message = ex.getMessage();
+			if(message == null || StringUtils.isEmpty(message)){
+				message = ResultCode.EXCEPTION.getMsg();
+			}
+			result.setMsg(message);
 		}
-		return handleErrorInfo(request,ex.getCode(),ex.getMessage(),ex);
+		result.setData(newData(request));
+		log.info(" customExceptionHandler=>" + result.toString());
+		return result;
 	}
 
 
-	@ExceptionHandler(NullOrEmptyException.class)
-	@ResponseBody
-	public Result<String> nullOrEmptyExceptionHandler(HttpServletRequest request, NullOrEmptyException ex){
-		if(ex.getCode() == null){
-			return handleErrorInfo(request,ex.getMessage(),ex);
-		}
-		return handleErrorInfo(request,ex.getMessage(),ex);
+	private Object newData(HttpServletRequest request){
+		return new JSONObject().put("uri",request.getRequestURI());
 	}
 
-
-	@ExceptionHandler(IllegalPropertiesException.class)
-	@ResponseBody
-	public Result<String> illegalPropExceptionHandler(HttpServletRequest request,
-																  IllegalPropertiesException ex){
-		if(ex.getCode() == null){
-			return handleErrorInfo(request,ex.getMessage(),ex);
-		}
-		return handleErrorInfo(request,ex.getMessage(),ex);
-	}
-
-
-	private Result<String> handleErrorInfo(HttpServletRequest request, Integer code,String message, Exception ex){
-		Result<String> errorMessage = new Result();
-		errorMessage.setCode(code);
-		errorMessage.setMsg("url:" + request.getRequestURI() + ",message:" + message);
-		errorMessage.setData(ex.getMessage());
-		return errorMessage;
-	}
-
-	private Result<String> handleErrorInfo(HttpServletRequest request,String message, Exception ex){
-		Result<String> errorMessage = new Result();
-		errorMessage.setCode(ResultCode.EXCEPTION.getCode());
-		errorMessage.setMsg("url:" + request.getRequestURI() + ",message:" + message);
-		errorMessage.setData(ex.getMessage());
-		return errorMessage;
-	}
 
 }

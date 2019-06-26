@@ -1,5 +1,6 @@
 package com.website.imtechcat.common.exception;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,26 +11,17 @@ import lombok.Setter;
  * @Date 2019/6/10 19:16
  * @Version 1.0
  **/
-@Setter
-@Getter
+@Data
 public class IllegalPropertiesException extends
 		RuntimeException {
 
-
-	private String message;
 	private Integer code;
-
-	public IllegalPropertiesException(){
-		setMessage("Parameter is illegal");
-	}
-
-	public IllegalPropertiesException(String message){
-		this.message = message;
-	}
+	private String message;
 
 	public IllegalPropertiesException(Integer code,String message){
 		this.code = code;
 		this.message = message;
 	}
+
 
 }

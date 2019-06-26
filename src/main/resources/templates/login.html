@@ -49,12 +49,11 @@
                                 var token = data.data.token;
                                 localStorage.setItem("token",token);
                                 window.location.href = "/home";
-                            }else{
-                                alert(data.msg);
                             }
+                            alert(data.msg);
                         },
                         error:function (error) {
-
+                            alert(error.msg);
                             console.log("--error:"+error.responseText);
                         }
                     })

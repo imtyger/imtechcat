@@ -3,6 +3,7 @@ package com.website.imtechcat.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @Version 1.0
  **/
 @Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "users")

@@ -1,56 +1,48 @@
 package com.website.imtechcat.util;
 
+import com.website.imtechcat.common.Constant;
+import com.website.imtechcat.common.ResultCode;
 import com.website.imtechcat.common.exception.TokenNotFoundException;
 import com.website.imtechcat.entity.UserEntity;
 import io.jsonwebtoken.*;
-import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 
 /**
- * @ClassName JwtUtil
+ * @ClassName JwtTokenUtil
  * @Description jwt配置处理类
  * @Author Lenovo
  * @Date 2019/5/29 9:59
  * @Version 1.0
  **/
+@Slf4j
 @Component
-@Data
-public class JwtUtil {
-	private static Logger logger = LoggerFactory.getLogger(JwtUtil.class);
+public class JwtTokenUtil {
 
-	@Value("${spring.jwt.secret}")
-	private String secret;
-	@Value("${spring.jwt.expire}")
-	private String expire;
-	@Value("${spring.jwt.header}")
-	private String header;
-
-	public String getSecret() {
-		return secret;
-	}
-
-	public String getExpire() {
-		return expire;
-	}
-
-	public String getHeader() {
-		return header;
-	}
-
+	@Resource
+	private Constant constant;
 	/**
 	 *解析token
 	 **/
-	public Claims parseToken(String jsonWebToken) {
-		Claims claims = Jwts.parser()
-				.setSigningKey(getSecret())
-				.parseClaimsJws(jsonWebToken).getBody();
-		return claims;
-
+	public Claims parseToken(String jsonWebToken){
+		Claims claims;
+		try{
+			claims = Jwts.parser()
+					.setSigningKey(constant.getSecret())
+					.parseClaimsJws(jsonWebToken).getBody();
+			return claims;
+		}catch (ExpiredJwtException ex){
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token expired");
+		}catch (SignatureException ex){
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token invalid");
+		}catch (Exception ex){
+			log.error(this.getClass() + " catch an exception =>" + ex);
+			// throw new TokenNotFoundException(ResultCode.EXCEPTION.getCode(),ex.getMessage());
+		}
+		return null;
 	}
 
 	/**
@@ -58,13 +50,13 @@ public class JwtUtil {
 	 **/
 	public String createToken(UserEntity userEntity){
 		Date date = new Date();
-		Date expireDate = new Date(date.getTime()+ Long.parseLong(getExpire()) );
+		Date expireDate = new Date(date.getTime()+ Long.parseLong(constant.getExpire()) );
 		JwtBuilder builder = Jwts.builder()
 				.setHeaderParam("typ","JWT")
 				.setSubject(userEntity.getId())
 				.setIssuedAt(date)
 				.setExpiration(expireDate)
-				.signWith(SignatureAlgorithm.HS256,getSecret());
+				.signWith(SignatureAlgorithm.HS256,constant.getSecret());
 		return builder.compact();
 	}
 
@@ -72,8 +64,8 @@ public class JwtUtil {
 	 * 判断token是否已经失效
 	 */
 	public boolean isTokenExpired(String jsonWebToken) {
-		Date expiredDate = getExpiredDateFromToken(jsonWebToken);
-		return expiredDate.before(new Date());
+		Date expireDate = getExpiredDateFromToken(jsonWebToken);
+		return expireDate.before(new Date());
 	}
 
 	/**
@@ -107,13 +99,7 @@ public class JwtUtil {
 	 * 从token中获取用户ID
 	 */
 	public String getUserIdFromToken(String jsonWebToken) {
-		String userId;
-		try {
 			Claims claims = parseToken(jsonWebToken);
-			userId =  claims.getSubject();
-		} catch (Exception e) {
-			userId = null;
-		}
-		return userId;
+			return claims.getSubject();
 	}
 }
