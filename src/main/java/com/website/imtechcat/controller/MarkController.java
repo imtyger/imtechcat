@@ -225,7 +225,7 @@ public class MarkController {
 			pageSize = 30;
 		}
 		Map resultMap = new HashMap();
-
+		List<Bookmark> bookmarks = new ArrayList<>();
 		try{
 			Long count = markServiceImpl.marksCount();
 			resultMap.put(constant.getCount(),count);
@@ -234,13 +234,12 @@ public class MarkController {
 				resultMap.put(constant.getPageNum(),pageNum);
 				resultMap.put(constant.getPageSize(),pageSize);
 				resultMap.put(constant.getPageTotal(),0);
-				resultMap.put(constant.getList(),"");
+				resultMap.put(constant.getList(),bookmarks);
 				return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
 			}
 
 			Page<MarkEntity> marks = markServiceImpl.findMarks(pageNum, pageSize, null);
 			List<MarkEntity> list = marks.getContent();
-			List<Bookmark> bookmarks = new ArrayList<>();
 			for(MarkEntity entity : list){
 				Bookmark bookmark = new Bookmark();
 				bookmark.setId(entity.getId());

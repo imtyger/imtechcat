@@ -239,6 +239,7 @@ public class BlogController {
 			pageSize = 30;
 		}
 		Map resultMap = new HashMap();
+		List<Blog> blogList = new ArrayList<>();
 		try {
 			Long count = blogServiceImpl.blogCount();
 			resultMap.put(constant.getCount(),count);
@@ -247,13 +248,12 @@ public class BlogController {
 				resultMap.put(constant.getPageNum(),pageNum);
 				resultMap.put(constant.getPageSize(),pageSize);
 				resultMap.put(constant.getPageTotal(),0);
-				resultMap.put(constant.getList(),"");
+				resultMap.put(constant.getList(),blogList);
 				return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
 			}
 
 			Page<BlogEntity> blogs = blogServiceImpl.findBlogList(pageNum,pageSize,null);
 			List<BlogEntity> list = blogs.getContent();
-			List<Blog> blogList = new ArrayList<>();
 			for(BlogEntity entity : list){
 				Blog blog = new Blog();
 				blog.setId(entity.getId());

@@ -29,8 +29,6 @@ public class ImtechcatApplicationTests {
 	@Autowired
 	private MarkService markService;
 
-	@Autowired
-	private MarkRepository markRepository;
 
 
 	// @Test
@@ -50,7 +48,7 @@ public class ImtechcatApplicationTests {
 	}
 
 
-	@Test
+	// @Test
 	public void updateMark(){
 		MarkEntity markEntity = markService.findById("5d2b241336a7290900566c5c");
 		List<String> tagList = new ArrayList();
@@ -68,22 +66,7 @@ public class ImtechcatApplicationTests {
 
 	}
 
-	@Test
-	public void tagTest(){
-		//获取全部tag名称list
-		List<String> tagNameList = tagService.findAllTagNameList();
-		List<MarkEntity> markEntityList = markRepository.findMarkEntitiesByTagsContaining(tagNameList);
-		String tagName = "vue";
-		int count = markRepository.countByTagsContains(tagName);
-		log.info(tagName + "->count :" + count);
-		// for(MarkEntity markEntity : markEntityList){
-		//
-		//
-		// 	if(isTagNameExist(markEntity,tagName)){
-		//
-		// 	}
-		// }
-	}
+
 
 	public static boolean isTagNameExist(MarkEntity markEntity, String tagName){
 		if(markEntity.getTags().contains(tagName)){
