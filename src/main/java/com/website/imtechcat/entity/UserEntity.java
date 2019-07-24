@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 /**
  * @ClassName UserEntity
  * @Description TODO
@@ -28,9 +30,9 @@ public class UserEntity {
 	private String avataricon;//头像图标
 	private String userphone;//手机号
 	private String email;//邮箱
-	private long createTime;//注册时间
-	private long lastUpdateTime;//最后更新时间
-	private long lastLoginTime;//最后登录时间
+	private Date createTime;//注册时间
+	private Date lastUpdateTime;//最后更新时间
+	private Date lastLoginTime;//最后登录时间
 	private String lastLoginIp;//最后登录ip
 
 }

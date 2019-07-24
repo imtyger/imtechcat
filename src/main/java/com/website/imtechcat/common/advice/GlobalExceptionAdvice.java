@@ -47,7 +47,7 @@ public class GlobalExceptionAdvice {
 			}
 			result.setMsg(message);
 		}
-		result.setData(newData(request));
+		// result.setData(newData(request));
 		log.info(" customExceptionHandler=>" + result.toString());
 		return result;
 	}

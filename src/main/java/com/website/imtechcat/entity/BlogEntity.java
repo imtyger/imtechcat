@@ -7,26 +7,31 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * @ClassName TagEntity
+ * @ClassName BlogEntity
  * @Description TODO
  * @Author Lenovo
- * @Date 2019/6/3 14:51
+ * @Date 2019/7/8 10:43
  * @Version 1.0
  **/
-@Document(collection = "tags")
+@Document(collection = "blog")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagEntity {
+public class BlogEntity {
 
 	@Id
 	private String id;
-	private String userId;
-	private String tagName;
-	private String tagDesc;
-	private int count;
+	private String author;
+	private String blogTitle;
+	private String blogContent;
+	private String blogHtml;
+	private List<String> tags;
+	private long visitCount;
 	private Date createdAt;
 	private Date lastUpdatedAt;
+
+
 }

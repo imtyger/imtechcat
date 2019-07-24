@@ -53,8 +53,8 @@ public class Sha256Util {
 
 
 	public static void main(String[] args){
-		String pwd = "admin";
+		String pwd = "MaXiaoHu~2019";
 		System.out.println(getSHA256(pwd));
-		//8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+//1040019d258fc3f7976dd5015a5a1e3d6c4569cda63b5b8c169ff50e6508c91e
 	}
 }

@@ -5,13 +5,13 @@ import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.service.UserService;
+import com.website.imtechcat.util.CheckUtil;
 import com.website.imtechcat.util.IpAddressUtil;
 import com.website.imtechcat.util.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,8 +40,7 @@ public class UserController {
 	@Resource
 	private Constant constant;
 
-	@RequestMapping(value={"/","/login"},method = RequestMethod.GET)
-	@PassToken
+
 	public String login(){
 		return "/login";
 	}
@@ -50,55 +49,64 @@ public class UserController {
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
 	@PassToken
 	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity,HttpServletRequest request){
-		log.info("==================loginPost");
+		log.info("method: loginPost=> " + userEntity.toString());
+		if(null == userEntity){
+			log.warn(" userEntity is null.");
+			return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
+		}
+
+		String username = userEntity.getUsername();
+		String password = userEntity.getPassword();
+
+		if (CheckUtil.isNull(username) || CheckUtil.isNull(password) ||
+				CheckUtil.isSpecial(username) || CheckUtil.isSpaces(password)){
+			log.warn(" username/password is null or special or has spaces.");
+			return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
+		}
+
+		int nameCharSize = CheckUtil.getCharNum(username);
+		int pwdCharSize = CheckUtil.getCharNum(password);
+
+		if(nameCharSize < 5 || nameCharSize > 20 || pwdCharSize < 5 || pwdCharSize > 20){
+			log.warn(" username/password wrong length.");
+			return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
+		}
+
 		try{
 			userEntity.setLastLoginIp(IpAddressUtil.getIpAddr(request));
 
 			UserEntity user = userServiceImpl.login(userEntity);
-			if(user == null){
+			if(null == user){
+				log.warn(" userEntity does not exist.");
 				return new ResponseEntity<>(Result.userNotFound(),HttpStatus.OK);
 			}
 
 			String token = jwtTokenUtil.createToken(user);
-			if(null == token || StringUtils.isEmpty(token)){
+			if(null == token || CheckUtil.isNull(token)){
+				log.warn(" token is null");
 				return new ResponseEntity<>(Result.unAuth(),HttpStatus.OK);
 			}
 
-			Map map = new HashMap();
-			map.put(constant.getToken(),token);
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			Map userMap = new HashMap();
+			userMap.put("id", user.getId());
+			userMap.put("avataricon", user.getAvataricon());
+			userMap.put("nickname", user.getNickname());
+			userMap.put("username", user.getUsername());
+
+			Map resultMap = new HashMap();
+			resultMap.put(constant.getToken(),token);
+			resultMap.put("refresh_token","");
+			resultMap.put("expires_in",Long.parseLong(constant.getExpire()) / 1000);
+			resultMap.put(constant.getUserKey(),userMap);
+			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
 
 		}catch(Exception ex){
 			String msg = ex.getMessage();
+			log.error("login post catch exception => " + ex);
 			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value={"/register"},method = {RequestMethod.GET,RequestMethod.POST})
-	@PassToken
-	public ResponseEntity<Result> register(@RequestBody UserEntity userEntity, HttpServletRequest request){
-		try{
-			//最近登录ip
-			userEntity.setLastLoginIp(IpAddressUtil.getIpAddr(request));
-
-			String id = userServiceImpl.register(userEntity);
-			if(id == null){
-				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
-			}
-
-			String token = jwtTokenUtil.createToken(userEntity);
-
-			Map map = new HashMap();
-			map.put(constant.getToken(),token);
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
-		}catch(Exception ex){
-			String msg = ex.getCause().getMessage();
-			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
-		}
-	}
-
-	@RequestMapping(value={"/error"},method = {RequestMethod.GET,RequestMethod.POST})
-	@PassToken
 	public String error(HttpServletRequest request){
 		log.info("===================error===================");
 		return "error";

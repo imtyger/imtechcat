@@ -2,6 +2,8 @@ package com.website.imtechcat.service.impl;
 
 import com.website.imtechcat.common.PageUtil;
 import com.website.imtechcat.entity.TagEntity;
+import com.website.imtechcat.repository.BlogRepository;
+import com.website.imtechcat.repository.MarkRepository;
 import com.website.imtechcat.repository.TagRepository;
 import com.website.imtechcat.service.TagService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +11,9 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
+import javax.management.Query;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -26,53 +30,38 @@ public class TagServiceImpl implements TagService {
 	@Resource
 	private TagRepository tagRepository;
 
-	@Override
-	public Page<TagEntity> findTagEntitiesPageByUserId(String userId,Integer pageNum, Integer pageSize, Sort sort) {
-		PageUtil pageUtil = newPage(pageNum,pageSize,sort);
+	@Resource
+	private MarkRepository markRepository;
 
-		Page<TagEntity> tagEntitiesByUserId = tagRepository.findTagEntitiesByUserId(userId,pageUtil);
-		return tagEntitiesByUserId;
-	}
+	@Resource
+	private BlogRepository blogRepository;
 
-	@Override
-	public boolean findTagEntityByIdAndUserIdExists(TagEntity tagEntity) {
-		return tagRepository.findTagEntityByIdAndUserIdExists(tagEntity.getId(),tagEntity.getUserId());
-	}
 
 	@Override
 	public Long tagsCount() {
 		return tagRepository.count();
 	}
 
-	@Override
-	public Long tagsCountByUser(String userId) {
-		TagEntity tagEntity = new TagEntity();
-		tagEntity.setUserId(userId);
-		Example<TagEntity> example = Example.of(tagEntity);
-		return tagRepository.count(example);
-	}
 
 	@Override
 	public TagEntity newTags(TagEntity tagEntity) {
+		tagEntity.setCreatedAt(new Date());
+		tagEntity.setLastUpdatedAt(new Date());
 		return tagRepository.insert(tagEntity);
 	}
 
 	@Override
 	public TagEntity updateTags(TagEntity tagEntity) {
+		tagEntity.setLastUpdatedAt(new Date());
 		return tagRepository.save(tagEntity);
 	}
 
 	@Override
 	public Page<TagEntity> findAll(Integer pageNum, Integer pageSize, Sort sort) {
-		PageUtil pageUtil = newPage(pageNum,pageSize,sort);
+		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
 		Page<TagEntity> tagEntityPage = tagRepository.findAll(pageUtil);
 		return tagEntityPage;
-	}
-
-	@Override
-	public void deleteAllTags() {
-		tagRepository.deleteAll();
 	}
 
 	@Override
@@ -82,53 +71,142 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	public Page<TagEntity> findTagEntityByTagName(String tagName, Integer pageNum, Integer pageSize, Sort sort) {
-		PageUtil pageUtil = newPage(pageNum,pageSize,sort);
+		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
 		Page<TagEntity> tagEntityPage = tagRepository.findTagEntityByTagName(tagName,pageUtil);
 		return tagEntityPage;
 	}
 
 	@Override
-	public Page<TagEntity> findTagEntityByUserIdAndTagName(String userId, String tagName, Integer pageNum, Integer pageSize,
-														   Sort sort) {
-		PageUtil pageUtil = newPage(pageNum,pageSize,sort);
+	public Page<TagEntity> findTagEntityByTagNameLike(String tagName, Integer pageNum, Integer pageSize, Sort sort) {
+		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
-		Page<TagEntity> tagEntityPage = tagRepository.findTagEntityByUserIdAndTagName(userId,tagName,pageUtil);
+		Page<TagEntity> tagEntityPage = tagRepository.findTagEntityByTagNameLike(tagName,pageUtil);
 		return tagEntityPage;
 	}
 
+
 	@Override
-	public Long tagsCountByTagName(String tagName) {
-		TagEntity tagEntity = new TagEntity();
-		tagEntity.setTagName(tagName);
-		Example<TagEntity> example = Example.of(tagEntity);
-		return tagRepository.count(example);
+	public Long countTagEntitiesByTagName(String tagName) {
+		return tagRepository.countTagEntitiesByTagName(tagName);
 	}
 
 	@Override
-	public Long tagsCountByUserIdAndTagName(String userId, String tagName) {
-		TagEntity tagEntity = new TagEntity();
-		tagEntity.setUserId(userId);
-		tagEntity.setTagName(tagName);
-		Example<TagEntity> example = Example.of(tagEntity);
-		return tagRepository.count(example);
+	public Long countTagEntitiesByTagNameLike(String tagName) {
+		return tagRepository.countTagEntitiesByTagNameLike(tagName);
 	}
+
 
 	@Override
 	public List<TagEntity> findByTagNameLike(String tagName) {
 		return tagRepository.findByTagNameLike(tagName);
 	}
 
-
-	private static PageUtil newPage(Integer pageNum, Integer pageSize,Sort sort){
-		PageUtil pageUtil = new PageUtil();
-		pageUtil.setPageNum(pageNum);
-		pageUtil.setPageSize(pageSize);
-		if(sort == null){
-			sort = new Sort(Sort.Direction.DESC,"lastUpdatedAt");
+	@Override
+	public boolean findTagEntityByTagName(String tagName) {
+		TagEntity tagEntity = tagRepository.findTagEntityByTagName(tagName);
+		if(tagEntity != null){
+			return true;
 		}
-		pageUtil.setSort(sort);
-		return pageUtil;
+		return false;
+	}
+
+	@Override
+	public boolean findById(TagEntity tagEntity) {
+		TagEntity entity = tagRepository.findTagEntityById(tagEntity.getId());
+		if(entity != null){
+			return true;
+		}
+		return false;
+	}
+
+
+	@Override
+	public List<String> findAllTagNameList() {
+		List<TagEntity> tagEntities = tagRepository.findAll();
+		if(tagEntities != null && tagEntities.size() != 0){
+			List<String> tags = tagEntities.stream().map(tagEntity -> {
+				return tagEntity.getTagName();
+			}).collect(Collectors.toList());
+			return tags;
+		}
+		return null;
+	}
+
+	@Override
+	public List<String> findAllTagIdList() {
+		List<TagEntity> tagEntities = tagRepository.findAll();
+		if(tagEntities != null && tagEntities.size() != 0){
+			List<String> tags = tagEntities.stream().map(tagEntity -> {
+				return tagEntity.getId();
+			}).collect(Collectors.toList());
+			return tags;
+		}
+		return null;
+	}
+
+	@Override
+	public List<Map> getTagCloudList() {
+
+		List<String> tagNameList = this.findAllTagNameList();
+		if(tagNameList == null){
+			return null;
+		}
+
+		List<TagEntity> tagEntityList = new ArrayList<>();
+		List<Map> tagCloudList = new ArrayList<>();
+
+		try {
+			for(String tagName : tagNameList){
+				int inMark = markRepository.countByTagsContains(tagName);
+				int inBlog = blogRepository.countByTagsContains(tagName);
+				int count = inMark + inBlog;
+
+				TagEntity tagEntity = tagRepository.findTagEntityByTagName(tagName);
+				tagEntity.setCount(count);
+				tagEntity.setLastUpdatedAt(new Date());
+				tagEntityList.add(tagEntity);
+
+				Map map = new HashMap();
+				map.put("tagName",tagName);
+				map.put("count",count);
+				tagCloudList.add(map);
+			}
+
+			tagRepository.saveAll(tagEntityList);
+
+		}catch (Exception ex){
+			ex.printStackTrace();
+		}
+
+		return tagCloudList;
+	}
+
+
+	public void updateTagCount(List<String> tags, int actionSign){
+		if(tags == null || tags.size() == 0){
+			return;
+		}
+
+		try {
+			List<TagEntity> tagEntities = new ArrayList<>();
+			for(String tag: tags){
+				TagEntity tagEntity = tagRepository.findTagEntityByTagName(tag);
+				int count = tagEntity.getCount();
+				if(actionSign == 1){
+					tagEntity.setCount(count + 1);
+				}else if(actionSign == -1){
+					tagEntity.setCount(count - 1);
+				}
+
+				tagEntity.setLastUpdatedAt(new Date());
+				tagEntities.add(tagEntity);
+			}
+			tagRepository.saveAll(tagEntities);
+
+		}catch (Exception ex){
+			log.error("update tag count catch exception", ex);
+		}
 	}
 
 }

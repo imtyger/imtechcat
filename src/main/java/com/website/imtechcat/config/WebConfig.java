@@ -25,7 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry){
 		//添加拦截器
 		registry.addInterceptor(interceptor).addPathPatterns("/**")
-		.excludePathPatterns("/","/login","/logout");
+		.excludePathPatterns("/","/login");
+				// "/swagger-ui.html","/swagger-resources", "/swagger-resources/**", "/v2/**");
 		// WebMvcConfigurer.super.addInterceptors(registry);
 	}
 

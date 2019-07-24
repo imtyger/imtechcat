@@ -1,21 +1,16 @@
 package com.website.imtechcat.service;
 
 import com.website.imtechcat.entity.TagEntity;
-import com.website.imtechcat.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TagService {
 
-	Page<TagEntity> findTagEntitiesPageByUserId(String userId,Integer pageNum, Integer pageSize, Sort sort);
-
-	boolean findTagEntityByIdAndUserIdExists(TagEntity tagEntity);
 
 	Long tagsCount();
-
-	Long tagsCountByUser(String userId);
 
 	TagEntity newTags(TagEntity tagEntity);
 
@@ -23,17 +18,27 @@ public interface TagService {
 
 	Page<TagEntity> findAll(Integer pageNum, Integer pageSize, Sort sort);
 
-	void deleteAllTags();
-
 	void deleteTags(TagEntity tagEntity);
 
 	Page<TagEntity> findTagEntityByTagName(String tagName,Integer pageNum, Integer pageSize, Sort sort);
 
-	Page<TagEntity> findTagEntityByUserIdAndTagName(String userId, String tagName,Integer pageNum, Integer pageSize, Sort sort);
+	Page<TagEntity> findTagEntityByTagNameLike(String tagName,Integer pageNum, Integer pageSize, Sort sort);
 
-	Long tagsCountByTagName(String tagName);
+	Long countTagEntitiesByTagName(String tagName);
 
-	Long tagsCountByUserIdAndTagName(String userId, String tagName);
+	Long countTagEntitiesByTagNameLike(String tagName);
 
 	List<TagEntity> findByTagNameLike(String tagName);
+
+	boolean findTagEntityByTagName(String tagName);
+
+	boolean findById(TagEntity tagEntity);
+
+	void updateTagCount(List<String> tags, int actionSign);
+
+	List<String> findAllTagNameList();
+
+	List<String> findAllTagIdList();
+
+	List<Map> getTagCloudList();
 }

@@ -55,6 +55,7 @@ public class JwtInterceptor extends HandlerInterceptorAdapter {
 
 		//通过request获取请求token信息
 		String authorization = request.getHeader(constant.getHeader());
+		log.info("authorization:" + authorization);
 
 		//判断请求头信息是否为空，
 		if(authorization == null || StringUtils.isEmpty(authorization) || authorization.trim().equals(constant.getNullStr())){
@@ -64,13 +65,13 @@ public class JwtInterceptor extends HandlerInterceptorAdapter {
 
 		//判断是否以Bearer 开头
 		if(!authorization.startsWith(constant.getPrefix())) {
-			throw new TokenNotFoundException(ResultCode.VALIDATE_FAILED.getCode(),"Authorization:Bearer not found.");
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"Authorization:Bearer not found.");
 		}
 
 		//取出token 判断是否为空或null
 		String token = authorization.replace(constant.getPrefix() + " ","");
 		if(StringUtils.isEmpty(token) || token == null || token.trim().equals(constant.getNullStr())){
-			throw new TokenNotFoundException(ResultCode.VALIDATE_FAILED.getCode(),"token is empty or null.");
+			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token is empty or null.");
 		}
 
 		//解析token 判断claims是否为空

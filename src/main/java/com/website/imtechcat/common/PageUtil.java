@@ -81,4 +81,16 @@ public class PageUtil implements Pageable {
 	public boolean hasPrevious() {
 		return false;
 	}
+
+	public static PageUtil newPage(Integer pageNum, Integer pageSize,Sort sort){
+		PageUtil pageUtil = new PageUtil();
+		pageUtil.setPageNum(pageNum);
+		pageUtil.setPageSize(pageSize);
+		if(sort == null){
+			sort = new Sort(Sort.Direction.DESC,"lastUpdatedAt");
+		}
+		pageUtil.setSort(sort);
+		return pageUtil;
+	}
+
 }

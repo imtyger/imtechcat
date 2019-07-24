@@ -35,30 +35,36 @@ public class Constant {
 	private String token;
 	@Value("${jwt.prefix}")
 	private String prefix;
-	@Value("{jwt.user.key}")
+	@Value("${jwt.userKey}")
 	private String userKey;
 
-	@Value("{string.null}")
+	@Value("${string.null}")
 	private String nullStr;
-	@Value("{string.url}")
+	@Value("${string.url}")
 	private String url;
-	@Value("{string.result}")
+	@Value("${string.result}")
 	private String result;
 
-	@Value("{string.tags.get.zero}")
-	private String tagsZero;
-	@Value("{string.tags.get.empty}")
-	private String tagsEmpty;
+	@Value("${string.zero}")
+	private String zero;
+	@Value("${string.empty}")
+	private String empty;
 
-	@Value("{string.tags.count}")
-	private String tagsCount;
-	@Value("{string.tags.pagenum}")
-	private String tagsPageNum;
-	@Value("{string.tags.pagesize}")
-	private String tagsPageSize;
-	@Value("{string.tags.pagetotal}")
-	private String tagsPageTotal;
-	@Value("{string.tags}")
-	private String tags;
+	@Value("${string.count}")
+	private String count;
+	@Value("${string.pageNum}")
+	private String pageNum;
+	@Value("${string.pageSize}")
+	private String pageSize;
+	@Value("${string.pageTotal}")
+	private String pageTotal;
+	@Value("${string.list}")
+	private String list;
+
+	@Value("${page.num}")
+	private String num;
+	@Value("${page.size}")
+	private String size;
+
 
 }

@@ -3,10 +3,15 @@ package com.website.imtechcat.service.impl;
 import com.website.imtechcat.entity.UserEntity;
 import com.website.imtechcat.repository.UserRepository;
 import com.website.imtechcat.service.UserService;
+import com.website.imtechcat.util.CheckUtil;
 import com.website.imtechcat.util.Sha256Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -44,9 +49,10 @@ public class UserServiceImpl implements UserService {
 			return null;
 		}
 		//更新最近登录时间
-		user.setLastLoginTime(System.currentTimeMillis());
+		user.setLastLoginTime(new Date());
 		//更新最近登录ip
 		user.setLastLoginIp(userEntity.getLastLoginIp());
+
 		return 	userRepository.save(user);
 	}
 
@@ -62,11 +68,11 @@ public class UserServiceImpl implements UserService {
 
 			//密码加密
 			userEntity.setPassword(Sha256Util.getSHA256(userEntity.getPassword()));
-			long time = System.currentTimeMillis();
+			Date date = new Date();
 			//注册时间
-			userEntity.setCreateTime(time);
+			userEntity.setCreateTime(date);
 			//最近登录时间
-			userEntity.setLastLoginTime(time);
+			userEntity.setLastLoginTime(date);
 
 			//创建成功返回id
 			return userRepository.insert(userEntity).getId();
@@ -84,5 +90,32 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String modifyUserEntity(UserEntity userEntity) {
 		return userRepository.save(userEntity).getId();
+	}
+
+	@Override
+	public Map account(String userId) {
+		UserEntity userEntity = this.findUserEntityById(userId);
+
+		if(userEntity == null){
+			return null;
+		}
+
+		Map userMap = new HashMap();
+		String id = userEntity.getId();
+		String username = userEntity.getUsername();
+		String avataricon = userEntity.getAvataricon();
+		String nickname = userEntity.getNickname();
+
+		userMap.put("id",id);
+		userMap.put("username",username);
+
+		if(!CheckUtil.isNull(avataricon)){
+			userMap.put("avataricon",avataricon);
+		}
+		if(!CheckUtil.isNull(nickname)){
+			userMap.put("nickname",nickname);
+		}
+
+		return userMap;
 	}
 }

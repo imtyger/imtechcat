@@ -5,6 +5,7 @@ import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.entity.TagEntity;
 import com.website.imtechcat.service.TagService;
+import com.website.imtechcat.util.CheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,28 +37,31 @@ public class SearchController {
 	@Resource
 	private Constant constant;
 
-	@RequestMapping(value={"/home/search"},method = RequestMethod.GET)
+	@RequestMapping(value={"/search"},method = RequestMethod.GET)
 	@PassToken
 	public String search(){
 		log.info("================search================");
-		return "/home/search";
+		return "/search";
 	}
 
 	@RequestMapping(value={"/api/1.0/searchtagnamelike"},method = RequestMethod.GET)
-	@PassToken
 	public ResponseEntity<Result> findByTagNameLike(String searchStr){
+
+		if(!CheckUtil.isNull(searchStr)){
+			return new ResponseEntity<>(Result.fail(constant.getEmpty()), HttpStatus.OK);
+		}
 
 		List<TagEntity> tagEntityList = tagServiceImpl.findByTagNameLike(searchStr.trim());
 		Map map = new HashMap();
 
 
 		if(tagEntityList.size() == 0 || tagEntityList == null){
-			map.put(constant.getTagsCount(),"0");
-			return new ResponseEntity<>(Result.fail(constant.getTagsEmpty(),map), HttpStatus.OK);
+			map.put(constant.getCount(),"0");
+			return new ResponseEntity<>(Result.fail(constant.getEmpty(),map), HttpStatus.OK);
 		}
 
-		map.put(constant.getTagsCount(),tagEntityList.size());
-		map.put(constant.getTags(),tagEntityList);
+		map.put(constant.getCount(),tagEntityList.size());
+		map.put(constant.getList(),tagEntityList);
 
 		return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
 	}
