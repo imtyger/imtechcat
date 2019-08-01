@@ -14,6 +14,8 @@ public interface BlogService {
 
 	BlogEntity updateBlog(BlogEntity blogEntity);
 
+	BlogEntity updateBlogVisitCount(BlogEntity blogEntity);
+
 	boolean findById(BlogEntity blogEntity);
 
 	Long blogCount();

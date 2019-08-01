@@ -117,6 +117,13 @@ public class BlogController {
 				blogEntity.setAuthor(nickName);
 			}
 
+			String htmlBody = CheckUtil.getHtmlBody(blogEntity.getBlogHtml());
+			if(htmlBody.length() > 100 ){
+				blogEntity.setBlogProfile(htmlBody.substring(0,100));
+			}else{
+				blogEntity.setBlogProfile(htmlBody);
+			}
+
 			BlogEntity entity = blogServiceImpl.newBlog(blogEntity);
 			if(entity == null || entity.getId() == null){
 				return new ResponseEntity<>(Result.fail(), HttpStatus.OK);
@@ -258,7 +265,7 @@ public class BlogController {
 				Blog blog = new Blog();
 				blog.setId(entity.getId());
 				blog.setBlogTitle(entity.getBlogTitle());
-				blog.setBlogHtml(entity.getBlogHtml());
+				blog.setBlogProfile(entity.getBlogProfile());
 				blog.setTags(entity.getTags());
 				blog.setCreatedAt(entity.getCreatedAt());
 				blogList.add(blog);
@@ -288,10 +295,13 @@ public class BlogController {
 
 		try {
 			BlogEntity blogEntity = blogServiceImpl.findBlogEntityById(id);
+			if(blogEntity == null){
+				return new ResponseEntity<>(Result.success(null), HttpStatus.OK);
+			}
 
 			long visitCount = blogEntity.getVisitCount() + 1;
 			blogEntity.setVisitCount(visitCount);
-			BlogEntity entity = blogServiceImpl.updateBlog(blogEntity);
+			BlogEntity entity = blogServiceImpl.updateBlogVisitCount(blogEntity);
 
 			Blog blog = new Blog();
 			blog.setId(entity.getId());
@@ -315,14 +325,13 @@ public class BlogController {
 		if(CheckUtil.isNull(tagName)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
 		}
-
+		List<Map> result = new ArrayList<>();
 		try {
 			List<BlogEntity> list = blogServiceImpl.findBlogEntitiesByTagName(tagName);
 			if(list == null){
-				return new ResponseEntity<>(Result.success(null),HttpStatus.OK);
+				return new ResponseEntity<>(Result.success(result),HttpStatus.OK);
 			}
 
-			List<Map> result = new ArrayList<>();
 			for(BlogEntity entity : list){
 				Map map = new HashMap();
 				map.put("id",entity.getId());

@@ -218,11 +218,13 @@ public class TagController {
 	@PassToken
 	public ResponseEntity<Result> getTagCloud(){
 		log.info(" this getTagCloud==>");
-
+		Map resultMap = new HashMap();
 		try {
 			List<Map> cloudList = tagServiceImpl.getTagCloudList();
 
-			return new ResponseEntity<>(Result.success(cloudList),HttpStatus.OK);
+			resultMap.put("list",cloudList);
+
+			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" get tag cloud list catch exception => " + ex);

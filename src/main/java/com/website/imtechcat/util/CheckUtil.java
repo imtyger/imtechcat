@@ -1,6 +1,8 @@
 package com.website.imtechcat.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Matcher;
@@ -82,6 +84,12 @@ public class CheckUtil {
 
 	protected static String getRegex(){
 		return DEFAULT_REGEX;
+	}
+
+
+	public static String getHtmlBody(String html){
+		Document document = Jsoup.parse(html);
+		return document.text();
 	}
 
 }

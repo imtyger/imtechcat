@@ -45,6 +45,11 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
+	public BlogEntity updateBlogVisitCount(BlogEntity blogEntity) {
+		return blogRepository.save(blogEntity);
+	}
+
+	@Override
 	public boolean findById(BlogEntity blogEntity) {
 		BlogEntity entity = blogRepository.findBlogEntityById(blogEntity.getId());
 		if(entity != null){

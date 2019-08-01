@@ -26,6 +26,7 @@ public class BlogEntity {
 	private String id;
 	private String author;
 	private String blogTitle;
+	private String blogProfile;
 	private String blogContent;
 	private String blogHtml;
 	private List<String> tags;

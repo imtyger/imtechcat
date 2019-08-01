@@ -21,6 +21,7 @@ public class Blog {
 
 	private String id;
 	private String blogTitle;
+	private String blogProfile;
 	private String blogHtml;
 	private List<String> tags;
 	private Date createdAt;
