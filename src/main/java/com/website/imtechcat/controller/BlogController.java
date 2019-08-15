@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -55,7 +57,8 @@ public class BlogController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/blogs", method = RequestMethod.GET)
-	public ResponseEntity<Result> queryBlogList(HttpServletRequest request,Integer pageNum, Integer pageSize){
+	public ResponseEntity<Result> queryBlogList(HttpServletRequest request, Integer pageNum, Integer pageSize,
+												ModelMap modelMap){
 		log.info("this.queryBlogList()==>" + " pageNum:"+ pageNum+ ", pageSize:"+pageSize);
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
@@ -66,26 +69,24 @@ public class BlogController {
 
 		try {
 			Long count = blogServiceImpl.blogCount();
+			modelMap.put(constant.getCount(),count);
 
-			Map map = new HashMap();
-			map.put(constant.getCount(),count);
-
-			if(count == 0 || pageNum > count){
-				map.put(constant.getPageNum(),pageNum);
-				map.put(constant.getPageSize(),pageSize);
-				map.put(constant.getPageTotal(),0);
-				map.put(constant.getList(),"");
-				return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			if(count == 0){
+				modelMap.put(constant.getPageNum(),pageNum);
+				modelMap.put(constant.getPageSize(),pageSize);
+				modelMap.put(constant.getPageTotal(),0);
+				modelMap.put(constant.getList(),"");
+				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
 			Page<BlogEntity> blogList = blogServiceImpl.findBlogList(pageNum,pageSize,null);
 
-			map.put(constant.getPageNum(),pageNum);
-			map.put(constant.getPageSize(),pageSize);
-			map.put(constant.getPageTotal(),blogList.getTotalPages());
-			map.put(constant.getList(),blogList.getContent());
+			modelMap.put(constant.getPageNum(),pageNum);
+			modelMap.put(constant.getPageSize(),pageSize);
+			modelMap.put(constant.getPageTotal(),blogList.getTotalPages());
+			modelMap.put(constant.getList(),blogList.getContent());
 
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error("query blog list catch an exception=>", ex);
@@ -118,8 +119,8 @@ public class BlogController {
 			}
 
 			String htmlBody = CheckUtil.getHtmlBody(blogEntity.getBlogHtml());
-			if(htmlBody.length() > 100 ){
-				blogEntity.setBlogProfile(htmlBody.substring(0,100));
+			if(htmlBody.length() > 200 ){
+				blogEntity.setBlogProfile(htmlBody.substring(0,200));
 			}else{
 				blogEntity.setBlogProfile(htmlBody);
 			}
@@ -134,7 +135,14 @@ public class BlogController {
 				tagServiceImpl.updateTagCount(tags,1);
 			}
 
-			return new ResponseEntity<>(Result.success(entity), HttpStatus.OK);
+			Map result = new HashMap();
+			result.put("id", entity.getId());
+			result.put("blogTitle", entity.getBlogTitle());
+			result.put("createdAt", entity.getCreatedAt());
+			result.put("lastUpdatedAt", entity.getLastUpdatedAt());
+			result.put("tags", entity.getTags());
+
+			return new ResponseEntity<>(Result.success(result), HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" new blog catch an exception=>", ex);
@@ -143,7 +151,7 @@ public class BlogController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/blog/update",method = RequestMethod.PUT)
-	public ResponseEntity<Result> updateBlog(@RequestBody BlogEntity blogEntity) {
+	public ResponseEntity<Result> updateBlog(@RequestBody BlogEntity blogEntity, ModelMap modelMap) {
 		if (blogEntity == null){
 			return new ResponseEntity<>(Result.fail("未收到传递值"), HttpStatus.OK);
 		}else if (CheckUtil.isNull(blogEntity.getId())){
@@ -161,6 +169,12 @@ public class BlogController {
 			if(tags != null && tags.size() != 0){
 				tagServiceImpl.updateTagCount(tags,1);
 			}
+
+			modelMap.put("id", entity.getId());
+			modelMap.put("blogTitle", entity.getBlogTitle());
+			modelMap.put("createdAt", entity.getCreatedAt());
+			modelMap.put("lastUpdatedAt", entity.getLastUpdatedAt());
+			modelMap.put("tags", entity.getTags());
 
 			return new ResponseEntity<>(Result.success(entity), HttpStatus.OK);
 		} catch (Exception ex) {
@@ -202,7 +216,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/blogs/bytagname", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getBlogListByTagName(String tagName){
+	public ResponseEntity<Result> getBlogListByTagName(String tagName, ModelMap modelMap){
 		log.info("this getBlogListByTagName==> tagName : " + tagName);
 		if(CheckUtil.isNull(tagName)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
@@ -217,11 +231,10 @@ public class BlogController {
 
 			List<Map> blogList = new ArrayList<>();
 			for(BlogEntity blogEntity : blogEntityList){
-				Map map = new HashMap();
-				map.put("tagName",tagName);
-				map.put("blogTitle",blogEntity.getBlogTitle());
-				map.put("blogHtml",blogEntity.getBlogHtml());
-				blogList.add(map);
+				modelMap.put("tagName",tagName);
+				modelMap.put("blogTitle",blogEntity.getBlogTitle());
+				modelMap.put("blogHtml",blogEntity.getBlogHtml());
+				blogList.add(modelMap);
 			}
 
 			return new ResponseEntity<>(Result.success(blogList),HttpStatus.OK);
@@ -237,7 +250,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/blogs", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getBlogList(Integer pageNum, Integer pageSize){
+	public ResponseEntity<Result> getBlogList(Integer pageNum, Integer pageSize, ModelMap modelMap, Model model){
 		log.info("this.getBlogList()==>" + " pageNum:"+ pageNum+ ", pageSize:"+pageSize);
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
@@ -245,23 +258,22 @@ public class BlogController {
 		if(null == pageSize || pageSize <= 0 || pageSize > 300 || CheckUtil.isNull(pageSize+"")){
 			pageSize = 30;
 		}
-		Map resultMap = new HashMap();
+
 		List<Blog> blogList = new ArrayList<>();
 		try {
 			Long count = blogServiceImpl.blogCount();
-			resultMap.put(constant.getCount(),count);
+			modelMap.put(constant.getCount(),count);
 
 			if(count == 0){
-				resultMap.put(constant.getPageNum(),pageNum);
-				resultMap.put(constant.getPageSize(),pageSize);
-				resultMap.put(constant.getPageTotal(),0);
-				resultMap.put(constant.getList(),blogList);
-				return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+				modelMap.put(constant.getPageNum(),pageNum);
+				modelMap.put(constant.getPageSize(),pageSize);
+				modelMap.put(constant.getPageTotal(),0);
+				modelMap.put(constant.getList(),blogList);
+				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
 			Page<BlogEntity> blogs = blogServiceImpl.findBlogList(pageNum,pageSize,null);
-			List<BlogEntity> list = blogs.getContent();
-			for(BlogEntity entity : list){
+			for(BlogEntity entity : blogs.getContent()){
 				Blog blog = new Blog();
 				blog.setId(entity.getId());
 				blog.setBlogTitle(entity.getBlogTitle());
@@ -271,12 +283,12 @@ public class BlogController {
 				blogList.add(blog);
 			}
 
-			resultMap.put(constant.getPageNum(),pageNum);
-			resultMap.put(constant.getPageSize(),pageSize);
-			resultMap.put(constant.getPageTotal(),blogs.getTotalPages());
-			resultMap.put(constant.getList(),blogList);
+			modelMap.put(constant.getPageNum(),pageNum);
+			modelMap.put(constant.getPageSize(),pageSize);
+			modelMap.put(constant.getPageTotal(),blogs.getTotalPages());
+			modelMap.put(constant.getList(),blogList);
 
-			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error("get blog list catch an exception=>", ex);
@@ -287,7 +299,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/blogs/post/{id}", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getBlogDetailsById(@PathVariable("id") String id){
+	public ResponseEntity<Result> getBlogDetailsById(@PathVariable("id") String id, ModelMap modelMap){
 		log.info("this.getBlogDetailsById()==> id:" + id );
 		if(CheckUtil.isNull(id)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
@@ -295,22 +307,20 @@ public class BlogController {
 
 		try {
 			BlogEntity blogEntity = blogServiceImpl.findBlogEntityById(id);
-			if(blogEntity == null){
-				return new ResponseEntity<>(Result.success(null), HttpStatus.OK);
+			if(blogEntity != null){
+				long visitCount = blogEntity.getVisitCount() + 1;
+				blogEntity.setVisitCount(visitCount);
+				BlogEntity entity = blogServiceImpl.updateBlogVisitCount(blogEntity);
+
+				modelMap.addAttribute("id",entity.getId());
+				modelMap.addAttribute("blogTitle", entity.getBlogTitle());
+				modelMap.addAttribute("blogHtml", entity.getBlogHtml());
+				modelMap.addAttribute("tags",entity.getTags());
+				modelMap.addAttribute("createdAt",entity.getCreatedAt());
+
 			}
 
-			long visitCount = blogEntity.getVisitCount() + 1;
-			blogEntity.setVisitCount(visitCount);
-			BlogEntity entity = blogServiceImpl.updateBlogVisitCount(blogEntity);
-
-			Blog blog = new Blog();
-			blog.setId(entity.getId());
-			blog.setBlogTitle(entity.getBlogTitle());
-			blog.setBlogHtml(entity.getBlogHtml());
-			blog.setTags(entity.getTags());
-			blog.setCreatedAt(entity.getCreatedAt());
-
-			return new ResponseEntity<>(Result.success(blog),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error("get blog details by id catch an exception=>", ex);
@@ -328,16 +338,14 @@ public class BlogController {
 		List<Map> result = new ArrayList<>();
 		try {
 			List<BlogEntity> list = blogServiceImpl.findBlogEntitiesByTagName(tagName);
-			if(list == null){
-				return new ResponseEntity<>(Result.success(result),HttpStatus.OK);
-			}
-
-			for(BlogEntity entity : list){
-				Map map = new HashMap();
-				map.put("id",entity.getId());
-				map.put("blogTitle",entity.getBlogTitle());
-				map.put("createdAt",entity.getCreatedAt());
-				result.add(map);
+			if(list != null){
+				for(BlogEntity entity : list){
+					Map map = new HashMap();
+					map.put("id",entity.getId());
+					map.put("blogTitle",entity.getBlogTitle());
+					map.put("createdAt",entity.getCreatedAt());
+					result.add(map);
+				}
 			}
 
 			return new ResponseEntity<>(Result.success(result),HttpStatus.OK);

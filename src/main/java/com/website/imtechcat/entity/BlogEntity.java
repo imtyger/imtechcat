@@ -30,6 +30,7 @@ public class BlogEntity {
 	private String blogContent;
 	private String blogHtml;
 	private List<String> tags;
+	private boolean flag;
 	private long visitCount;
 	private Date createdAt;
 	private Date lastUpdatedAt;

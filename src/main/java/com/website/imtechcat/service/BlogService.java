@@ -10,7 +10,7 @@ public interface BlogService {
 
 	BlogEntity newBlog(BlogEntity blogEntity);
 
-	void deleteBlog(BlogEntity blogEntity);
+	BlogEntity deleteBlog(BlogEntity blogEntity);
 
 	BlogEntity updateBlog(BlogEntity blogEntity);
 

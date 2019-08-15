@@ -30,12 +30,14 @@ public class BlogServiceImpl implements BlogService {
 	public BlogEntity newBlog(BlogEntity blogEntity) {
 		blogEntity.setCreatedAt(new Date());
 		blogEntity.setLastUpdatedAt(new Date());
+		blogEntity.setFlag(true);
 		return blogRepository.insert(blogEntity);
 	}
 
 	@Override
-	public void deleteBlog(BlogEntity blogEntity) {
-		blogRepository.delete(blogEntity);
+	public BlogEntity deleteBlog(BlogEntity blogEntity) {
+		blogEntity.setFlag(false);
+		return blogRepository.save(blogEntity);
 	}
 
 	@Override
@@ -60,20 +62,20 @@ public class BlogServiceImpl implements BlogService {
 
 	@Override
 	public Long blogCount() {
-		return blogRepository.count();
+		return blogRepository.countBlogEntitiesByFlagIsTrue();
 	}
 
 	@Override
 	public Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort) {
 		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
-		Page<BlogEntity> blogEntities = blogRepository.findAll(pageUtil);
+		Page<BlogEntity> blogEntities = blogRepository.findBlogEntitiesByFlagIsTrue(pageUtil);
 		return blogEntities;
 	}
 
 	@Override
 	public List<BlogEntity> findBlogEntitiesByTagName(String tagName) {
-		return blogRepository.findBlogEntitiesByTagsContains(tagName);
+		return blogRepository.findBlogEntitiesByTagsContainsAndFlagIsTrue(tagName);
 	}
 
 	@Override

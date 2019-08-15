@@ -1,6 +1,8 @@
 package com.website.imtechcat.repository;
 
+import com.website.imtechcat.common.PageUtil;
 import com.website.imtechcat.entity.BlogEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +18,9 @@ public interface BlogRepository extends MongoRepository<BlogEntity, String> {
 
 	int countByTagsContains(String tagName);
 
-	List<BlogEntity> findBlogEntitiesByTagsContains(String tagName);
+	long countBlogEntitiesByFlagIsTrue();
+
+	Page<BlogEntity> findBlogEntitiesByFlagIsTrue(PageUtil pageUtil);
+
+	List<BlogEntity> findBlogEntitiesByTagsContainsAndFlagIsTrue(String tagName);
 }

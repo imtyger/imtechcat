@@ -30,6 +30,7 @@ public class MarkEntity {
 	private String markDesc;
 	private String markLink;
 	private List<String> tags;
+	private boolean flag;
 	private Date createdAt;
 	private Date lastUpdatedAt;
 }

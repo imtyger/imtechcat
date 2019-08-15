@@ -4,7 +4,6 @@ import com.website.imtechcat.common.Constant;
 import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.entity.MarkEntity;
-import com.website.imtechcat.entity.TagEntity;
 import com.website.imtechcat.model.Bookmark;
 import com.website.imtechcat.service.MarkService;
 import com.website.imtechcat.service.TagService;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,7 +49,7 @@ public class MarkController {
 
 
 	@RequestMapping(value = "/api/1.0/home/bookmarks", method = RequestMethod.GET)
-	public ResponseEntity<Result> queryMarks(HttpServletRequest request,Integer pageNum, Integer pageSize){
+	public ResponseEntity<Result> queryMarks(HttpServletRequest request, Integer pageNum, Integer pageSize, ModelMap modelMap){
 		log.info("this.queryMarks()==>" + " pageNum:"+ pageNum+ ", pageSize:"+pageSize);
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
@@ -61,25 +61,24 @@ public class MarkController {
 		try{
 			Long count = markServiceImpl.marksCount();
 
-			Map map = new HashMap();
-			map.put(constant.getCount(),count);
+			modelMap.put(constant.getCount(),count);
 
-			if(count == 0 || pageNum > count){
-				map.put(constant.getPageNum(),pageNum);
-				map.put(constant.getPageSize(),pageSize);
-				map.put(constant.getPageTotal(),0);
-				map.put(constant.getList(),"");
-				return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			if(count == 0){
+				modelMap.put(constant.getPageNum(),pageNum);
+				modelMap.put(constant.getPageSize(),pageSize);
+				modelMap.put(constant.getPageTotal(),0);
+				modelMap.put(constant.getList(),"");
+				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
 			Page<MarkEntity> marks = markServiceImpl.findMarks(pageNum, pageSize, null);
 
-			map.put(constant.getPageNum(),pageNum);
-			map.put(constant.getPageSize(),pageSize);
-			map.put(constant.getPageTotal(),marks.getTotalPages());
-			map.put(constant.getList(),marks.getContent());
+			modelMap.put(constant.getPageNum(),pageNum);
+			modelMap.put(constant.getPageSize(),pageSize);
+			modelMap.put(constant.getPageTotal(),marks.getTotalPages());
+			modelMap.put(constant.getList(),marks.getContent());
 
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" query marks catch exception => " + ex);
@@ -164,7 +163,6 @@ public class MarkController {
 				return new ResponseEntity<>(Result.fail("Mark不存在"),HttpStatus.OK);
 			}
 
-
 			MarkEntity mark = markServiceImpl.updateMark(markEntity);
 			List<String> tags = mark.getTags();
 			if(tags != null && tags.size() != 0){
@@ -182,7 +180,7 @@ public class MarkController {
 
 	@RequestMapping(value = "/api/1.0/bookmarks/bytagname", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getMarkListByTagName(String tagName){
+	public ResponseEntity<Result> getMarkListByTagName(String tagName, ModelMap modelMap){
 		log.info("this getMarkListByTagName==> tagName : " + tagName);
 		if(CheckUtil.isNull(tagName)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
@@ -195,12 +193,11 @@ public class MarkController {
 				return new ResponseEntity<>(Result.success(markEntityList),HttpStatus.OK);
 			}
 
-			List<Map> markList = new ArrayList<>();
+			List<ModelMap> markList = new ArrayList<>();
 			for(MarkEntity markEntity : markEntityList){
-				Map map = new HashMap();
-				map.put("markTitle",markEntity.getMarkTitle());
-				map.put("markLink",markEntity.getMarkLink());
-				markList.add(map);
+				modelMap.put("markTitle",markEntity.getMarkTitle());
+				modelMap.put("markLink",markEntity.getMarkLink());
+				markList.add(modelMap);
 			}
 
 			return new ResponseEntity<>(Result.success(markList),HttpStatus.OK);
@@ -216,7 +213,8 @@ public class MarkController {
 
 	@RequestMapping(value = "/api/1.0/bookmarks", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getBookmarkList(HttpServletRequest request,Integer pageNum, Integer pageSize){
+	public ResponseEntity<Result> getBookmarkList(HttpServletRequest request, Integer pageNum, Integer pageSize,
+												  ModelMap modelMap){
 		log.info("this.getBookmarkList()==>" + " pageNum:"+ pageNum+ ", pageSize:"+pageSize);
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
@@ -224,23 +222,22 @@ public class MarkController {
 		if(null == pageSize || pageSize <= 0 || pageSize > 300 || CheckUtil.isNull(pageSize+"")){
 			pageSize = 30;
 		}
-		Map resultMap = new HashMap();
+
 		List<Bookmark> bookmarks = new ArrayList<>();
 		try{
 			Long count = markServiceImpl.marksCount();
-			resultMap.put(constant.getCount(),count);
+			modelMap.put(constant.getCount(),count);
 
 			if(count == 0){
-				resultMap.put(constant.getPageNum(),pageNum);
-				resultMap.put(constant.getPageSize(),pageSize);
-				resultMap.put(constant.getPageTotal(),0);
-				resultMap.put(constant.getList(),bookmarks);
-				return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+				modelMap.put(constant.getPageNum(),pageNum);
+				modelMap.put(constant.getPageSize(),pageSize);
+				modelMap.put(constant.getPageTotal(),0);
+				modelMap.put(constant.getList(),bookmarks);
+				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
 			Page<MarkEntity> marks = markServiceImpl.findMarks(pageNum, pageSize, null);
-			List<MarkEntity> list = marks.getContent();
-			for(MarkEntity entity : list){
+			for(MarkEntity entity : marks.getContent()){
 				Bookmark bookmark = new Bookmark();
 				bookmark.setId(entity.getId());
 				bookmark.setMarkTitle(entity.getMarkTitle());
@@ -251,12 +248,12 @@ public class MarkController {
 				bookmarks.add(bookmark);
 			}
 
-			resultMap.put(constant.getPageNum(),pageNum);
-			resultMap.put(constant.getPageSize(),pageSize);
-			resultMap.put(constant.getPageTotal(),marks.getTotalPages());
-			resultMap.put(constant.getList(),bookmarks);
+			modelMap.put(constant.getPageNum(),pageNum);
+			modelMap.put(constant.getPageSize(),pageSize);
+			modelMap.put(constant.getPageTotal(),marks.getTotalPages());
+			modelMap.put(constant.getList(),bookmarks);
 
-			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" get bookmark list catch exception => " + ex);

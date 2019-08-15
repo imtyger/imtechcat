@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -45,24 +46,22 @@ public class SearchController {
 	}
 
 	@RequestMapping(value={"/api/1.0/searchtagnamelike"},method = RequestMethod.GET)
-	public ResponseEntity<Result> findByTagNameLike(String searchStr){
+	public ResponseEntity<Result> findByTagNameLike(String searchStr, ModelMap modelMap){
 
 		if(!CheckUtil.isNull(searchStr)){
 			return new ResponseEntity<>(Result.fail(constant.getEmpty()), HttpStatus.OK);
 		}
 
 		List<TagEntity> tagEntityList = tagServiceImpl.findByTagNameLike(searchStr.trim());
-		Map map = new HashMap();
-
 
 		if(tagEntityList.size() == 0 || tagEntityList == null){
-			map.put(constant.getCount(),"0");
-			return new ResponseEntity<>(Result.fail(constant.getEmpty(),map), HttpStatus.OK);
+			modelMap.put(constant.getCount(),"0");
+			return new ResponseEntity<>(Result.fail(constant.getEmpty(),modelMap), HttpStatus.OK);
 		}
 
-		map.put(constant.getCount(),tagEntityList.size());
-		map.put(constant.getList(),tagEntityList);
+		modelMap.put(constant.getCount(),tagEntityList.size());
+		modelMap.put(constant.getList(),tagEntityList);
 
-		return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+		return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 	}
 }

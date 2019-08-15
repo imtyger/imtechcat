@@ -48,7 +48,7 @@ public class UserController {
 
 	@RequestMapping(value={"/api/1.0/login"},method = RequestMethod.POST)
 	@PassToken
-	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity,HttpServletRequest request){
+	public ResponseEntity<Result> loginPost(@RequestBody UserEntity userEntity, HttpServletRequest request){
 		log.info("method: loginPost=> " + userEntity.toString());
 		if(null == userEntity){
 			log.warn(" userEntity is null.");
@@ -93,12 +93,12 @@ public class UserController {
 			userMap.put("nickname", user.getNickname());
 			userMap.put("username", user.getUsername());
 
-			Map resultMap = new HashMap();
-			resultMap.put(constant.getToken(),token);
-			resultMap.put("refresh_token","");
-			resultMap.put("expires_in",Long.parseLong(constant.getExpire()) / 1000);
-			resultMap.put(constant.getUserKey(),userMap);
-			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+			Map result = new HashMap();
+			result.put(constant.getToken(),token);
+			result.put("refresh_token","");
+			result.put("expires_in",Long.parseLong(constant.getExpire()) / 1000);
+			result.put(constant.getUserKey(),userMap);
+			return new ResponseEntity<>(Result.success(result),HttpStatus.OK);
 
 		}catch(Exception ex){
 			String msg = ex.getMessage();

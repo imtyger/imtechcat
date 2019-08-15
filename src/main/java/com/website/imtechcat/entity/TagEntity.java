@@ -27,6 +27,7 @@ public class TagEntity {
 	private String tagName;
 	private String tagDesc;
 	private int count;
+	private boolean flag;
 	private Date createdAt;
 	private Date lastUpdatedAt;
 }

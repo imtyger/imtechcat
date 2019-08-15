@@ -3,11 +3,8 @@ package com.website.imtechcat.controller;
 import com.website.imtechcat.common.Constant;
 import com.website.imtechcat.common.Result;
 import com.website.imtechcat.common.annotation.PassToken;
-import com.website.imtechcat.entity.BlogEntity;
 import com.website.imtechcat.entity.TagEntity;
 import com.website.imtechcat.service.TagService;
-import com.website.imtechcat.service.impl.BlogServiceImpl;
-import com.website.imtechcat.task.ScheduledTask;
 import com.website.imtechcat.util.CheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,7 +43,7 @@ public class TagController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/tags", method = RequestMethod.GET)
-	public ResponseEntity<Result> findTags(HttpServletRequest request,Integer pageNum, Integer pageSize){
+	public ResponseEntity<Result> findTags(HttpServletRequest request,Integer pageNum, Integer pageSize, ModelMap modelMap){
 		log.info("this.findTags()==> pageNum:" + pageNum + ", pageSize:"+ pageSize );
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
@@ -57,25 +54,24 @@ public class TagController {
 		try {
 			Long count = tagServiceImpl.tagsCount();
 
-			Map map = new HashMap();
-			map.put(constant.getCount(),count);
+			modelMap.put(constant.getCount(),count);
 
 			if(count == 0 || pageNum > count){
-				map.put(constant.getPageNum(),pageNum);
-				map.put(constant.getPageSize(),pageSize);
-				map.put(constant.getPageTotal(),0);
-				map.put(constant.getList(),"");
-				return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+				modelMap.put(constant.getPageNum(),pageNum);
+				modelMap.put(constant.getPageSize(),pageSize);
+				modelMap.put(constant.getPageTotal(),0);
+				modelMap.put(constant.getList(),"");
+				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
 			Page<TagEntity> tags = tagServiceImpl.findAll(pageNum,pageSize,null);
 
-			map.put(constant.getPageNum(),pageNum);
-			map.put(constant.getPageSize(),pageSize);
-			map.put(constant.getPageTotal(),tags.getTotalPages());
-			map.put(constant.getList(),tags.getContent());
+			modelMap.put(constant.getPageNum(),pageNum);
+			modelMap.put(constant.getPageSize(),pageSize);
+			modelMap.put(constant.getPageTotal(),tags.getTotalPages());
+			modelMap.put(constant.getList(),tags.getContent());
 
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" find tags catch exception => " + ex);
@@ -86,7 +82,7 @@ public class TagController {
 
 
 	@RequestMapping(value = "/api/1.0/home/tags/new",method = RequestMethod.POST)
-	public ResponseEntity<Result> newTags(HttpServletRequest request,@RequestBody TagEntity tagEntity){
+	public ResponseEntity<Result> newTags(HttpServletRequest request, @RequestBody TagEntity tagEntity){
 		if(tagEntity == null){
 			return new ResponseEntity<>(Result.unValid("传递值null"), HttpStatus.OK);
 		}else if(CheckUtil.isNull(tagEntity.getTagName()) || CheckUtil.isNull(tagEntity.getTagDesc())){
@@ -110,6 +106,7 @@ public class TagController {
 			if(entity == null || entity.getId() == null){
 				return new ResponseEntity<>(Result.fail(),HttpStatus.OK);
 			}
+
 			return new ResponseEntity<>(Result.success(entity),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
@@ -169,16 +166,15 @@ public class TagController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/tags/defaultname", method = RequestMethod.GET)
-	public ResponseEntity<Result> findTagNamesDefault(HttpServletRequest request){
+	public ResponseEntity<Result> findTagNamesDefault(HttpServletRequest request, ModelMap modelMap){
 		log.info("this.findTagNamesDefault()==> ");
 
 		try {
 			List<String> tags = tagServiceImpl.findAllTagNameList();
 
-			Map map = new HashMap();
-			map.put("tags",tags);
+			modelMap.put("tags",tags);
 
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" find tags by like name catch exception => " + ex);
@@ -187,12 +183,11 @@ public class TagController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/tags/likename", method = RequestMethod.GET)
-	public ResponseEntity<Result> findTagNameLike(HttpServletRequest request,String tagName){
+	public ResponseEntity<Result> findTagNameLike(HttpServletRequest request,String tagName, ModelMap modelMap){
 		log.info("this.findTagNameLike()==> tagName:" + tagName);
 		if(CheckUtil.isNull(tagName)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
 		}
-		Map map = new HashMap();
 
 		try {
 			List<TagEntity> tagEntities = tagServiceImpl.findByTagNameLike(tagName);
@@ -201,12 +196,12 @@ public class TagController {
 				List<String> tags = tagEntities.stream().map(tagEntity -> {
 					return tagEntity.getTagName();
 				}).collect(Collectors.toList());
-				map.put("tags",tags);
+				modelMap.put("tags",tags);
 			}else{
-				map.put("tags",tagEntities);
+				modelMap.put("tags",tagEntities);
 			}
 
-			return new ResponseEntity<>(Result.success(map),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" find tags by like name catch exception => " + ex);
@@ -216,15 +211,14 @@ public class TagController {
 
 	@RequestMapping(value = "/api/1.0/tags", method = RequestMethod.GET)
 	@PassToken
-	public ResponseEntity<Result> getTagCloud(){
+	public ResponseEntity<Result> getTagCloud(ModelMap modelMap){
 		log.info(" this getTagCloud==>");
-		Map resultMap = new HashMap();
 		try {
 			List<Map> cloudList = tagServiceImpl.getTagCloudList();
 
-			resultMap.put("list",cloudList);
+			modelMap.put("list",cloudList);
 
-			return new ResponseEntity<>(Result.success(resultMap),HttpStatus.OK);
+			return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 		}catch (Exception ex){
 			String msg = ex.getMessage();
 			log.error(" get tag cloud list catch exception => " + ex);
