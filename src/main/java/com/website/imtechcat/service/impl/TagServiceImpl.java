@@ -159,7 +159,7 @@ public class TagServiceImpl implements TagService {
 		try {
 			for(String tagName : tagNameList){
 				int inMark = markRepository.countByTagsContains(tagName);
-				int inBlog = blogRepository.countByTagsContains(tagName);
+				int inBlog = blogRepository.countByTagsContainsAndStatusIsTrue(tagName);
 				int count = inMark + inBlog;
 
 				TagEntity tagEntity = tagRepository.findTagEntityByTagName(tagName);

@@ -18,7 +18,11 @@ public interface BlogRepository extends MongoRepository<BlogEntity, String> {
 
 	int countByTagsContains(String tagName);
 
+	int countByTagsContainsAndStatusIsTrue(String tagName);
+
 	long countBlogEntitiesByFlagIsTrue();
+
+	long countBlogEntitiesByFlagIsTrueAndStatusIsTrue();
 
 	Page<BlogEntity> findBlogEntitiesByFlagIsTrue(PageUtil pageUtil);
 

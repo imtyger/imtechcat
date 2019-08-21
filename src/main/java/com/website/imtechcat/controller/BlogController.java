@@ -299,7 +299,7 @@ public class BlogController {
 
 		List<Blog> blogList = new ArrayList<>();
 		try {
-			Long count = blogServiceImpl.blogCount();
+			Long count = blogServiceImpl.showBlogCount();
 			modelMap.put(constant.getCount(),count);
 
 			if(count == 0){

@@ -22,6 +22,8 @@ public interface BlogService {
 
 	Long blogCount();
 
+	Long showBlogCount();
+
 	Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort);
 
 	Page<BlogEntity> findHomeBlogList(Integer pageNum, Integer pageSize, Sort sort);

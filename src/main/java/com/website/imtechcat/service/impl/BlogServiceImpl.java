@@ -37,6 +37,7 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public BlogEntity deleteBlog(BlogEntity blogEntity) {
 		blogEntity.setFlag(false);
+		blogEntity.setStatus(false);
 		return blogRepository.save(blogEntity);
 	}
 
@@ -73,6 +74,11 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public Long blogCount() {
 		return blogRepository.countBlogEntitiesByFlagIsTrue();
+	}
+
+	@Override
+	public Long showBlogCount() {
+		return blogRepository.countBlogEntitiesByFlagIsTrueAndStatusIsTrue();
 	}
 
 	@Override
