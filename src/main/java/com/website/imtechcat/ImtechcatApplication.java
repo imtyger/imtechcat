@@ -13,6 +13,7 @@ public class ImtechcatApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ImtechcatApplication.class, args);
+		
 	}
 
 

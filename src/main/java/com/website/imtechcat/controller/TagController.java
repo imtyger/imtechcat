@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,7 +61,7 @@ public class TagController {
 				modelMap.put(constant.getPageNum(),pageNum);
 				modelMap.put(constant.getPageSize(),pageSize);
 				modelMap.put(constant.getPageTotal(),0);
-				modelMap.put(constant.getList(),"");
+				modelMap.put(constant.getList(),new ArrayList());
 				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 

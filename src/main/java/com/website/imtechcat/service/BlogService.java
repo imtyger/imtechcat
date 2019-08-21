@@ -22,6 +22,8 @@ public interface BlogService {
 
 	Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort);
 
+	Page<BlogEntity> findHomeBlogList(Integer pageNum, Integer pageSize, Sort sort);
+
 	List<BlogEntity> findBlogEntitiesByTagName(String tagName);
 
 	BlogEntity findBlogEntityById(String id);

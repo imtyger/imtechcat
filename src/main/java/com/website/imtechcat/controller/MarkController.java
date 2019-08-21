@@ -67,7 +67,7 @@ public class MarkController {
 				modelMap.put(constant.getPageNum(),pageNum);
 				modelMap.put(constant.getPageSize(),pageSize);
 				modelMap.put(constant.getPageTotal(),0);
-				modelMap.put(constant.getList(),"");
+				modelMap.put(constant.getList(),new ArrayList());
 				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 

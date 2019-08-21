@@ -31,6 +31,7 @@ public class BlogEntity {
 	private String blogHtml;
 	private List<String> tags;
 	private boolean flag;
+	private boolean status;
 	private long visitCount;
 	private Date createdAt;
 	private Date lastUpdatedAt;

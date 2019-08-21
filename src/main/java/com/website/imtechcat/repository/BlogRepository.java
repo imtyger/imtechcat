@@ -22,5 +22,7 @@ public interface BlogRepository extends MongoRepository<BlogEntity, String> {
 
 	Page<BlogEntity> findBlogEntitiesByFlagIsTrue(PageUtil pageUtil);
 
+	Page<BlogEntity> findBlogEntitiesByFlagIsTrueAndStatusIsTrue(PageUtil pageUtil);
+
 	List<BlogEntity> findBlogEntitiesByTagsContainsAndFlagIsTrue(String tagName);
 }

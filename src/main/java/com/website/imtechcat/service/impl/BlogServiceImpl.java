@@ -43,6 +43,7 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public BlogEntity updateBlog(BlogEntity blogEntity) {
 		blogEntity.setLastUpdatedAt(new Date());
+//		blogEntity.setFlag(true);
 		return blogRepository.save(blogEntity);
 	}
 
@@ -66,10 +67,18 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort) {
+	public Page<BlogEntity> findHomeBlogList(Integer pageNum, Integer pageSize, Sort sort) {
 		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
 		Page<BlogEntity> blogEntities = blogRepository.findBlogEntitiesByFlagIsTrue(pageUtil);
+		return blogEntities;
+	}
+
+	@Override
+	public Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort) {
+		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
+
+		Page<BlogEntity> blogEntities = blogRepository.findBlogEntitiesByFlagIsTrueAndStatusIsTrue(pageUtil);
 		return blogEntities;
 	}
 

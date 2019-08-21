@@ -75,11 +75,11 @@ public class BlogController {
 				modelMap.put(constant.getPageNum(),pageNum);
 				modelMap.put(constant.getPageSize(),pageSize);
 				modelMap.put(constant.getPageTotal(),0);
-				modelMap.put(constant.getList(),"");
+				modelMap.put(constant.getList(),new ArrayList());
 				return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
 			}
 
-			Page<BlogEntity> blogList = blogServiceImpl.findBlogList(pageNum,pageSize,null);
+			Page<BlogEntity> blogList = blogServiceImpl.findHomeBlogList(pageNum,pageSize,null);
 
 			modelMap.put(constant.getPageNum(),pageNum);
 			modelMap.put(constant.getPageSize(),pageSize);
@@ -96,6 +96,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/home/blog/new",method = RequestMethod.POST)
 	public ResponseEntity<Result> newBlog(@RequestBody BlogEntity blogEntity, HttpServletRequest request){
+		log.info("this.newBlog()==>");
 		if(blogEntity == null){
 			return new ResponseEntity<>(Result.fail("传递值null"), HttpStatus.OK);
 		}else if (CheckUtil.isNull(blogEntity.getBlogTitle()) || CheckUtil.isNull(blogEntity.getBlogContent())
@@ -151,7 +152,8 @@ public class BlogController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/blog/update",method = RequestMethod.PUT)
-	public ResponseEntity<Result> updateBlog(@RequestBody BlogEntity blogEntity, ModelMap modelMap) {
+	public ResponseEntity<Result> updateBlog(@RequestBody BlogEntity blogEntity) {
+		log.info("this.updateBlog()==>" + " id:"+ blogEntity.getId());
 		if (blogEntity == null){
 			return new ResponseEntity<>(Result.fail("未收到传递值"), HttpStatus.OK);
 		}else if (CheckUtil.isNull(blogEntity.getId())){
@@ -165,18 +167,36 @@ public class BlogController {
 			}
 
 			BlogEntity entity = blogServiceImpl.updateBlog(blogEntity);
+			log.info(entity.toString());
 			List<String> tags = entity.getTags();
-			if(tags != null && tags.size() != 0){
-				tagServiceImpl.updateTagCount(tags,1);
+			if(tags != null && tags.size() != 0) {
+				tagServiceImpl.updateTagCount(tags, 1);
 			}
 
-			modelMap.put("id", entity.getId());
-			modelMap.put("blogTitle", entity.getBlogTitle());
-			modelMap.put("createdAt", entity.getCreatedAt());
-			modelMap.put("lastUpdatedAt", entity.getLastUpdatedAt());
-			modelMap.put("tags", entity.getTags());
+			return new ResponseEntity<>(Result.success(), HttpStatus.OK);
+		} catch (Exception ex) {
+			String msg = ex.getMessage();
+			log.error("update blog catch an exception=>", ex);
+			return new ResponseEntity<>(Result.fail(msg), HttpStatus.OK);
 
-			return new ResponseEntity<>(Result.success(entity), HttpStatus.OK);
+		}
+	}
+
+	@RequestMapping(value = "/api/1.0/home/blog/update/{id}/{status}",method = RequestMethod.PUT)
+	public ResponseEntity<Result> updateBlogByIdAndStatus(@PathVariable("id") String id, @PathVariable("status") Boolean status, ModelMap modelMap) {
+		log.info("this.updateBlog()==>" + " id:"+ id + " , status:" + status);
+		if(CheckUtil.isNull(id) || CheckUtil.isNull(status+"")){
+			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
+		}
+
+		try {
+
+			BlogEntity entity = blogServiceImpl.findBlogEntityById(id);
+			entity.setStatus(status);
+			BlogEntity blogEntity = blogServiceImpl.updateBlog(entity);
+			modelMap.put("status",blogEntity.isStatus());
+
+			return new ResponseEntity<>(Result.success(modelMap), HttpStatus.OK);
 		} catch (Exception ex) {
 			String msg = ex.getMessage();
 			log.error("update blog catch an exception=>", ex);
@@ -188,6 +208,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/home/blog/delete",method = RequestMethod.DELETE)
 	public ResponseEntity<Result> deleteBlog(@RequestBody BlogEntity blogEntity) {
+		log.info("this.deleteBlog()==>" + " id:"+ blogEntity.getId());
 		if (blogEntity == null) {
 			return new ResponseEntity<>(Result.fail("未收到传递值"), HttpStatus.OK);
 		}else if (CheckUtil.isNull(blogEntity.getId())){
@@ -211,6 +232,25 @@ public class BlogController {
 			log.error("delete blog catch an exception=>", ex);
 			return new ResponseEntity<>(Result.fail(msg), HttpStatus.OK);
 
+		}
+	}
+
+	@RequestMapping(value = "/api/1.0/home/blog-edit/{id}", method = RequestMethod.GET)
+	@PassToken
+	public ResponseEntity<Result> getHomeBlogById(@PathVariable("id") String id){
+		log.info("this.getHomeBlogById()==> id:" + id );
+		if(CheckUtil.isNull(id)){
+			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
+		}
+
+		try {
+			BlogEntity blogEntity = blogServiceImpl.findBlogEntityById(id);
+
+			return new ResponseEntity<>(Result.success(blogEntity),HttpStatus.OK);
+		}catch (Exception ex){
+			String msg = ex.getMessage();
+			log.error("get home blog details by id catch an exception=>", ex);
+			return new ResponseEntity<>(Result.fail(msg), HttpStatus.OK);
 		}
 	}
 
