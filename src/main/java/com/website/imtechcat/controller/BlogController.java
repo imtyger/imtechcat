@@ -206,18 +206,16 @@ public class BlogController {
 	}
 
 
-	@RequestMapping(value = "/api/1.0/home/blog/delete",method = RequestMethod.DELETE)
-	public ResponseEntity<Result> deleteBlog(@RequestBody BlogEntity blogEntity) {
-		log.info("this.deleteBlog()==>" + " id:"+ blogEntity.getId());
-		if (blogEntity == null) {
-			return new ResponseEntity<>(Result.fail("未收到传递值"), HttpStatus.OK);
-		}else if (CheckUtil.isNull(blogEntity.getId())){
+	@RequestMapping(value = "/api/1.0/home/blog/delete/{id}",method = RequestMethod.DELETE)
+	public ResponseEntity<Result> deleteBlogById(@PathVariable("id") String id) {
+		log.info("this.deleteBlog()==>" + " id:"+ id );
+        if (CheckUtil.isNull(id)){
 			return new ResponseEntity<>(Result.unValid("参数缺失"),HttpStatus.OK);
 		}
 
 		try {
-			boolean b = blogServiceImpl.findById(blogEntity);
-			if (false == b) {
+			BlogEntity blogEntity = blogServiceImpl.findBlogEntityById(id);
+			if (blogEntity == null) {
 				return new ResponseEntity<>(Result.fail("博客不存在"), HttpStatus.OK);
 			}
 			List<String> tags = blogEntity.getTags();

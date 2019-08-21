@@ -62,6 +62,15 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
+	public boolean findById(String id) {
+		BlogEntity entity = blogRepository.findBlogEntityById(id);
+		if(entity != null){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Long blogCount() {
 		return blogRepository.countBlogEntitiesByFlagIsTrue();
 	}

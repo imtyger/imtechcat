@@ -18,6 +18,8 @@ public interface BlogService {
 
 	boolean findById(BlogEntity blogEntity);
 
+	boolean findById(String id);
+
 	Long blogCount();
 
 	Page<BlogEntity> findBlogList(Integer pageNum, Integer pageSize, Sort sort);
