@@ -1,7 +1,9 @@
 package com.website.imtechcat.service.impl;
 
 import com.website.imtechcat.common.PageUtil;
+import com.website.imtechcat.common.annotation.PassToken;
 import com.website.imtechcat.entity.BlogEntity;
+import com.website.imtechcat.model.Blog;
 import com.website.imtechcat.repository.BlogRepository;
 import com.website.imtechcat.service.BlogService;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ public class BlogServiceImpl implements BlogService {
 		blogEntity.setCreatedAt(new Date());
 		blogEntity.setLastUpdatedAt(new Date());
 		blogEntity.setFlag(true);
+		blogEntity.setStatus(false);
 		return blogRepository.insert(blogEntity);
 	}
 
@@ -47,6 +50,7 @@ public class BlogServiceImpl implements BlogService {
 //		blogEntity.setFlag(true);
 		return blogRepository.save(blogEntity);
 	}
+
 
 	@Override
 	public BlogEntity updateBlogVisitCount(BlogEntity blogEntity) {
@@ -71,9 +75,14 @@ public class BlogServiceImpl implements BlogService {
 		return false;
 	}
 
+//	@Override
+//	public Long blogCount() {
+//		return blogRepository.countBlogEntitiesByFlagIsTrue();
+//	}
+
 	@Override
-	public Long blogCount() {
-		return blogRepository.countBlogEntitiesByFlagIsTrue();
+	public Long homeBlogCount() {
+		return blogRepository.countBlogEntitiesByBlogTitleIsNotNull();
 	}
 
 	@Override
@@ -85,7 +94,7 @@ public class BlogServiceImpl implements BlogService {
 	public Page<BlogEntity> findHomeBlogList(Integer pageNum, Integer pageSize, Sort sort) {
 		PageUtil pageUtil = PageUtil.newPage(pageNum,pageSize,sort);
 
-		Page<BlogEntity> blogEntities = blogRepository.findBlogEntitiesByFlagIsTrue(pageUtil);
+		Page<BlogEntity> blogEntities = blogRepository.findBlogEntitiesByBlogTitleIsNotNull(pageUtil);
 		return blogEntities;
 	}
 
@@ -106,5 +115,25 @@ public class BlogServiceImpl implements BlogService {
 	public BlogEntity findBlogEntityById(String id) {
 		return blogRepository.findBlogEntityById(id);
 	}
+
+    @Override
+    public BlogEntity findBlogEntityByBlogTitleLike(String blogTitle) {
+        return blogRepository.findBlogEntityByBlogTitleLike(blogTitle);
+    }
+
+    @Override
+	public List<BlogEntity> findBlogEntitiesByQuery(String query) {
+
+		try{
+			List<BlogEntity> blogEntities =
+					blogRepository.findByStatusIsTrueAndFlagIsTrueAndBlogContentIgnoreCaseLike(query);
+			return blogEntities;
+		}catch (Exception ex){
+			ex.printStackTrace();
+			return null;
+		}
+
+	}
+
 
 }

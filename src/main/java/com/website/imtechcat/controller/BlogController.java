@@ -59,7 +59,7 @@ public class BlogController {
 	@RequestMapping(value = "/api/1.0/home/blogs", method = RequestMethod.GET)
 	public ResponseEntity<Result> queryBlogList(HttpServletRequest request, Integer pageNum, Integer pageSize,
 												ModelMap modelMap){
-		log.info("this.queryBlogList()==>" + " pageNum:"+ pageNum+ ", pageSize:"+pageSize);
+		log.info("this.queryBlogList()==> {} , {}", pageNum, pageSize);
 		if(null == pageNum || pageNum <= 0 || CheckUtil.isNull(pageNum+"")){
 			pageNum = Integer.parseInt(constant.getNum());
 		}
@@ -68,7 +68,7 @@ public class BlogController {
 		}
 
 		try {
-			Long count = blogServiceImpl.blogCount();
+			Long count = blogServiceImpl.homeBlogCount();
 			modelMap.put(constant.getCount(),count);
 
 			if(count == 0){
@@ -96,7 +96,7 @@ public class BlogController {
 
 	@RequestMapping(value = "/api/1.0/home/blog/new",method = RequestMethod.POST)
 	public ResponseEntity<Result> newBlog(@RequestBody BlogEntity blogEntity, HttpServletRequest request){
-		log.info("this.newBlog()==>");
+		log.info("this.newBlog()==> ");
 		if(blogEntity == null){
 			return new ResponseEntity<>(Result.fail("传递值null"), HttpStatus.OK);
 		}else if (CheckUtil.isNull(blogEntity.getBlogTitle()) || CheckUtil.isNull(blogEntity.getBlogContent())
@@ -234,7 +234,6 @@ public class BlogController {
 	}
 
 	@RequestMapping(value = "/api/1.0/home/blog-edit/{id}", method = RequestMethod.GET)
-	@PassToken
 	public ResponseEntity<Result> getHomeBlogById(@PathVariable("id") String id){
 		log.info("this.getHomeBlogById()==> id:" + id );
 		if(CheckUtil.isNull(id)){
@@ -369,7 +368,7 @@ public class BlogController {
 	@RequestMapping(value = "/api/1.0/tags/post/{tagName}", method = RequestMethod.GET)
 	@PassToken
 	public ResponseEntity<Result> getTagNameList(@PathVariable("tagName") String tagName){
-		log.info(" this getTagNameList==> tagName : " + tagName);
+		log.info(" this getTagNameList==> tagName : {} " , tagName);
 		if(CheckUtil.isNull(tagName)){
 			return new ResponseEntity<>(Result.fail("传递值null"),HttpStatus.OK);
 		}
@@ -393,4 +392,33 @@ public class BlogController {
 			return new ResponseEntity<>(Result.fail(msg),HttpStatus.OK);
 		}
 	}
+
+
+    @RequestMapping(value = "/api/1.0/about", method = RequestMethod.GET)
+    @PassToken
+    public ResponseEntity<Result> getAbout(ModelMap modelMap){
+        log.info("this.getAbout()==> ");
+
+        try {
+            BlogEntity blogEntity = blogServiceImpl.findBlogEntityByBlogTitleLike("关于本博客");
+            if(blogEntity != null){
+                long visitCount = blogEntity.getVisitCount() + 1;
+                blogEntity.setVisitCount(visitCount);
+                BlogEntity entity = blogServiceImpl.updateBlogVisitCount(blogEntity);
+
+                modelMap.addAttribute("id",entity.getId());
+                modelMap.addAttribute("blogTitle", entity.getBlogTitle());
+                modelMap.addAttribute("blogHtml", entity.getBlogHtml());
+                modelMap.addAttribute("tags",entity.getTags());
+                modelMap.addAttribute("createdAt",entity.getCreatedAt());
+
+            }
+
+            return new ResponseEntity<>(Result.success(modelMap),HttpStatus.OK);
+        }catch (Exception ex){
+            String msg = ex.getMessage();
+            log.error("get about catch an exception=>", ex);
+            return new ResponseEntity<>(Result.fail(msg), HttpStatus.OK);
+        }
+    }
 }

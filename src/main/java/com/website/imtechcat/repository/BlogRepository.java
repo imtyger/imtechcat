@@ -12,9 +12,13 @@ import java.util.List;
 @Repository
 public interface BlogRepository extends MongoRepository<BlogEntity, String> {
 
-	List<BlogEntity> findBlogEntitiesByBlogTitleLike(String blogTitle);
+	List<BlogEntity> findByStatusIsTrueAndFlagIsTrueAndBlogContentIgnoreCaseLike(String query);
+
+	List<BlogEntity> findBlogEntitiesByBlogContentIsLike(String query);
 
 	BlogEntity findBlogEntityById(String id);
+
+	BlogEntity findBlogEntityByBlogTitleLike(String blogTitle);
 
 	int countByTagsContains(String tagName);
 
@@ -22,9 +26,13 @@ public interface BlogRepository extends MongoRepository<BlogEntity, String> {
 
 	long countBlogEntitiesByFlagIsTrue();
 
+	long countBlogEntitiesByBlogTitleIsNotNull();
+
 	long countBlogEntitiesByFlagIsTrueAndStatusIsTrue();
 
 	Page<BlogEntity> findBlogEntitiesByFlagIsTrue(PageUtil pageUtil);
+
+	Page<BlogEntity> findBlogEntitiesByBlogTitleIsNotNull(PageUtil pageUtil);
 
 	Page<BlogEntity> findBlogEntitiesByFlagIsTrueAndStatusIsTrue(PageUtil pageUtil);
 

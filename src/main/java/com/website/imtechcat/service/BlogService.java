@@ -20,7 +20,9 @@ public interface BlogService {
 
 	boolean findById(String id);
 
-	Long blogCount();
+//	Long blogCount();
+
+	Long homeBlogCount();
 
 	Long showBlogCount();
 
@@ -31,5 +33,9 @@ public interface BlogService {
 	List<BlogEntity> findBlogEntitiesByTagName(String tagName);
 
 	BlogEntity findBlogEntityById(String id);
+
+	BlogEntity findBlogEntityByBlogTitleLike(String blogTitle);
+
+	List<BlogEntity> findBlogEntitiesByQuery(String query);
 
 }
