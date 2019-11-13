@@ -2,18 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.website</groupId>
-    <artifactId>imtechcat</artifactId>
+
+    <groupId>com.imtyger</groupId>
+    <artifactId>imtyger-bed</artifactId>
     <packaging>jar</packaging>
-    <!--<version>${maven.build.timestamp}</version>-->
-    <name>imtechcat</name>
-    <description>Demo project for Spring Boot</description>
+    <name>imtyger-bed</name>
+    <description>imtyger.com backed</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -26,13 +27,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -101,7 +97,7 @@
     </dependencies>
 
     <build>
-        <finalName>imtechcat</finalName>
+        <finalName>imtyger-bed</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
