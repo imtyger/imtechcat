@@ -47,7 +47,6 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public BlogEntity updateBlog(BlogEntity blogEntity) {
 		blogEntity.setLastUpdatedAt(new Date());
-//		blogEntity.setFlag(true);
 		return blogRepository.save(blogEntity);
 	}
 
