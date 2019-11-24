@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.util;
+package com.imtyger.imtygerbed.utils;
 
 import com.imtyger.imtygerbed.common.Constant;
 import com.imtyger.imtygerbed.common.ResultCode;
@@ -53,7 +53,7 @@ public class JwtTokenUtil {
 		Date expireDate = new Date(date.getTime()+ Long.parseLong(constant.getExpire()) );
 		JwtBuilder builder = Jwts.builder()
 				.setHeaderParam("typ","JWT")
-				.setSubject(userEntity.getId())
+				.setSubject(userEntity.getUsername())
 				.setIssuedAt(date)
 				.setExpiration(expireDate)
 				.signWith(SignatureAlgorithm.HS256,constant.getSecret());

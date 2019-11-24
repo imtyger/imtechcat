@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.List;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * @ClassName Bookmark
@@ -19,10 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 public class Bookmark {
 
-	private String id;
-	private String markTitle;
-	private String markDesc;
-	private String markLink;
-	private List<String> tags;
-	private Date createdAt;
+	@NotEmpty
+	private Integer id;
+
+	@NotEmpty
+	private String title;
+
+	@NotEmpty
+	private String link;
+
 }

@@ -4,55 +4,52 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 /**
- * @ClassName UserEntity
+ * @ClassName BookmarkEntity
  * @Description TODO
  * @Author Lenovo
- * @Date 2019/6/1 11:44
+ * @Date 2019/6/3 15:39
  * @Version 1.0
  **/
-@Data
+@TableName(value = "bookmarks")
+@Getter
+@Setter
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
-@TableName(value = "users")
-public class UserEntity {
+public class BookmarkEntity {
 
 	@TableId(value = "id", type = IdType.AUTO)
 	private Integer id;
 
-	@TableField(value = "username")
+	@TableField(value = "userId")
 	@NotEmpty
-	private String username;
+	private Integer userId;
 
-	@TableField(value = "password")
+	@TableField(value = "title")
 	@NotEmpty
-	private String password;
+	private String title;
 
-	@TableField(value = "nickName")
+	@TableField(value = "descr")
 	@NotEmpty
-	private String nickName;//昵称
+	private String descr;
 
-	@TableField(value = "avatar")
+	@TableField(value = "link")
 	@NotEmpty
-	private String avatar;//头像图标
+	private String link;
 
 	@TableField(value = "createdAt")
 	@NotEmpty
-	private Date createdAt;//注册时间
+	private Date createdAt;
 
 	@TableField(value = "updatedAt")
 	@NotEmpty
-	private Date updatedAt;//最后更新时间
-
+	private Date updatedAt;
 
 
 }

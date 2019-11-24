@@ -1,13 +1,12 @@
 package com.imtyger.imtygerbed.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @ClassName BlogEntity
@@ -16,25 +15,58 @@ import java.util.List;
  * @Date 2019/7/8 10:43
  * @Version 1.0
  **/
-@Document(collection = "blog")
+@TableName(value = "blogs")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlogEntity {
 
-	@Id
-	private String id;
-	private String author;
-	private String blogTitle;
-	private String blogProfile;
-	private String blogContent;
-	private String blogHtml;
-	private List<String> tags;
-	private boolean flag;
-	private boolean status;
-	private long visitCount;
+	@TableId(value = "id", type = IdType.AUTO)
+	private Integer id;
+
+	@TableField(value = "userId")
+	@NotEmpty
+	private Integer userId;
+
+	@TableField(value = "title")
+	@NotEmpty
+	private String title;
+
+	@TableField(value = "profile")
+	@NotEmpty
+	private String profile;
+
+	@TableField(value = "content")
+	@NotEmpty
+	private String content;
+
+	@TableField(value = "html")
+	@NotEmpty
+	private String html;
+
+	@TableField(value = "tags", updateStrategy = FieldStrategy.IGNORED)
+	private String tags;
+
+	@TableField(value = "status")
+	@NotEmpty
+	private Integer status;
+
+	@TableField(value = "deleted")
+	@TableLogic
+	@NotEmpty
+	private Integer deleted;
+
+	@TableField(value = "views")
+	@NotEmpty
+	private Integer views;
+
+	@TableField(value = "createdAt")
+	@NotEmpty
 	private Date createdAt;
-	private Date lastUpdatedAt;
+
+	@TableField(value = "updatedAt")
+	@NotEmpty
+	private Date updatedAt;
 
 
 }

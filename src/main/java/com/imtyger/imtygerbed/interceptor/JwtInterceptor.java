@@ -5,7 +5,7 @@ import com.imtyger.imtygerbed.common.ResultCode;
 import com.imtyger.imtygerbed.common.annotation.PassToken;
 import com.imtyger.imtygerbed.common.exception.NullOrEmptyException;
 import com.imtyger.imtygerbed.common.exception.TokenNotFoundException;
-import com.imtyger.imtygerbed.util.JwtTokenUtil;
+import com.imtyger.imtygerbed.utils.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;

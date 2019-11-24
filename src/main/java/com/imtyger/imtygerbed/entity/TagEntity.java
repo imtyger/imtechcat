@@ -1,11 +1,11 @@
 package com.imtyger.imtygerbed.entity;
 
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 /**
@@ -15,19 +15,37 @@ import java.util.Date;
  * @Date 2019/6/3 14:51
  * @Version 1.0
  **/
-@Document(collection = "tags")
+@TableName(value = "tags")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TagEntity {
 
-	@Id
-	private String id;
-	private String userId;
-	private String tagName;
-	private String tagDesc;
-	private int count;
-	private boolean flag;
+	@TableId(value = "id", type = IdType.AUTO)
+	private Integer id;
+
+	@TableField(value = "userId")
+	@NotEmpty
+	private Integer userId;
+
+	@TableField(value = "title")
+	@NotEmpty
+	private String title;
+
+	@TableField(value = "descr")
+	@NotEmpty
+	private String descr;
+
+	@TableField(value = "usedCount")
+	@NotEmpty
+	private Integer usedCount;
+
+	@TableField(value = "createdAt")
+	@NotEmpty
 	private Date createdAt;
-	private Date lastUpdatedAt;
+
+	@TableField(value = "updatedAt")
+	@NotEmpty
+	private Date updatedAt;
+
 }

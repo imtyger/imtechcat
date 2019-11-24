@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.util;
+package com.imtyger.imtygerbed.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;

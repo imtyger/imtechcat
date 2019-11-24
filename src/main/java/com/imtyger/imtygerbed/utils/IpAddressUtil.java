@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.util;
+package com.imtyger.imtygerbed.utils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;

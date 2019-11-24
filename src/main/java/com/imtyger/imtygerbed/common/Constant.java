@@ -1,12 +1,7 @@
 package com.imtyger.imtygerbed.common;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -31,8 +26,12 @@ public class Constant {
 	private String expire;
 	@Value("${jwt.header}")
 	private String header;
-	@Value("${jwt.token}")
-	private String token;
+	@Value("${jwt.accessToken}")
+	private String accessToken;
+	@Value("${jwt.refreshToken}")
+	private String refreshToken;
+	@Value("${jwt.expiresIn}")
+	private String expiresIn;
 	@Value("${jwt.prefix}")
 	private String prefix;
 	@Value("${jwt.userKey}")

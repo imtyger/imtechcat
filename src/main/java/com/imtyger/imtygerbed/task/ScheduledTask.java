@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName ScheduledTask
@@ -22,7 +20,7 @@ import java.util.Map;
 public class ScheduledTask {
 
 	@Resource
-	private TagService tagServiceImpl;
+	private TagService tagService;
 
 	// @Async
 	// @Scheduled(cron="0 0 1 * * ?")(fixedRate = 2000)
@@ -31,8 +29,8 @@ public class ScheduledTask {
 		log.info("this tagCloudTask==> start time:" + new Date());
 
 		try {
-			List<Map> list = tagServiceImpl.getTagCloudList();
-			log.info("this get tag cloud list : " + list.toString());
+			//更新tag usedCount
+			tagService.updateTagUsedCount();
 		}catch (Exception ex){
 			log.error("get tag cloud task catch exception", ex);
 		}

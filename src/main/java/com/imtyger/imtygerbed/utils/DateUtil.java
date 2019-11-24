@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.util;
+package com.imtyger.imtygerbed.utils;
 
 import java.util.Calendar;
 import java.util.Date;

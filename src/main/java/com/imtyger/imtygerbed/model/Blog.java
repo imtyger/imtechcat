@@ -1,10 +1,10 @@
 package com.imtyger.imtygerbed.model;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 
@@ -16,13 +16,22 @@ import java.util.List;
  * @Version 1.0
  **/
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@ToString
 public class Blog {
 
-	private String id;
-	private String blogTitle;
-	private String blogProfile;
+	@NotEmpty
+	private Integer id;
+
+	@NotEmpty
+	private String title;
+
+	@NotEmpty
+	private String profile;
+
+	@NotEmpty
 	private List<String> tags;
+
+	@NotEmpty
 	private Date createdAt;
+
 }

@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.common;
+package com.imtyger.imtygerbed.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-
-@ControllerAdvice
 @Slf4j
+@ControllerAdvice
 public class GlobalExceptionAdvice {
 
 	@ExceptionHandler(value = RuntimeException.class)

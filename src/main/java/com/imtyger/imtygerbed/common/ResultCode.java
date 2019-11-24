@@ -1,8 +1,6 @@
 package com.imtyger.imtygerbed.common;
 
 
-import javax.annotation.Resource;
-
 /**
  * @ClassName ResultCode
  * @Description TODO
