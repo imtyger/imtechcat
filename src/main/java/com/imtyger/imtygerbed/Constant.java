@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.common;
+package com.imtyger.imtygerbed;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,12 +7,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /**
- * @ClassName Constant
- * @Description TODO
- * @Author Lenovo
- * @Date 2019/6/12 19:05
- * @Version 1.0
- **/
+ * @Author imtygerx@gmail.com
+ * @Date 2019/7/8 11:03
+ */
+
 @Data
 @Configuration
 @PropertySource(value = "classpath:constant.properties")

@@ -16,14 +16,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * @ClassName SwaggerConfig
- * @Description TODO
- * @Author Lenovo
- * @Date 2019/5/27 21:05
- * @Version 1.0
- **/
+ * @Author: imtygerx@gmail.com
+ * @Date: 2019/5/27 21:05
+ */
+
 @Configuration
 @EnableSwagger2
 public class Swagger2Config {
@@ -31,7 +28,7 @@ public class Swagger2Config {
 	public Docket createRestApi(){
 		ParameterBuilder tokenPar = new ParameterBuilder();
 		List<Parameter> pars = new ArrayList<>();
-		tokenPar.name("Authorization").description("access_token").modelRef(new ModelRef("string")).parameterType(
+		tokenPar.name("Authorization").description("accessToken").modelRef(new ModelRef("string")).parameterType(
 				"header").required(false).build();
 		pars.add(tokenPar.build());
 

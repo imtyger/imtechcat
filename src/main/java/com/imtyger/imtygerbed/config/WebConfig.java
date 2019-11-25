@@ -1,21 +1,25 @@
 package com.imtyger.imtygerbed.config;
 
+import com.imtyger.imtygerbed.exception.handle.BusinessExceptionResolver;
 import com.imtyger.imtygerbed.interceptor.JwtInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
- * @ClassName WebConfig
- * @Description TODO
- * @Author Lenovo
+ * @Author imtygerx@gmail.com
  * @Date 2019/5/29 14:36
- * @Version 1.0
- **/
+ */
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+	@Resource
+	private BusinessExceptionResolver businessExceptionResolver;
 
 	@Resource
 	private JwtInterceptor interceptor;
@@ -29,5 +33,12 @@ public class WebConfig implements WebMvcConfigurer {
 		// WebMvcConfigurer.super.addInterceptors(registry);
 	}
 
-
+	/**
+	 * 全局异常处理
+	 * @param resolvers
+	 */
+	@Override
+	public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+		resolvers.add(businessExceptionResolver);
+	}
 }

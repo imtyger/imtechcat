@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.imtyger.imtygerbed.bean.tag.TagRequest;
 import com.imtyger.imtygerbed.bean.tag.TagUpdateRequest;
-import com.imtyger.imtygerbed.common.Constant;
+import com.imtyger.imtygerbed.common.PageResult;
 import com.imtyger.imtygerbed.entity.BlogEntity;
 import com.imtyger.imtygerbed.entity.TagEntity;
 import com.imtyger.imtygerbed.mapper.BlogMapper;
@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,12 +34,9 @@ public class TagService {
     @Resource
     private UserService userService;
 
-    @Resource
-    private Constant constant;
 
     /**
      * 获取tag 云
-     * @return
      */
     public List<Tag> getTagCloud(){
         List<TagEntity> tagEntityList = tagMapper.selectList(null);
@@ -50,44 +50,17 @@ public class TagService {
 
     /**
      * 获取Home页分页标签
-     * @param pageNum
-     * @param pageSize
-     * @return
      */
     public Map<String,Object> queryHomeTags(Integer pageNum, Integer pageSize){
         Page page = new Page(pageNum, pageSize);
-        IPage<TagEntity> iPage = tagMapper.selectPage(page, new QueryWrapper<>());
+        IPage iPage = tagMapper.selectPage(page, new QueryWrapper<>());
 
-        return getTagResult(pageNum, pageSize, iPage);
+        return PageResult.getResult(pageNum, pageSize, iPage);
     }
 
-    /**
-     * 封装返回结果
-     * @param pageNum
-     * @param pageSize
-     * @param iPage
-     * @return
-     */
-    private Map<String, Object> getTagResult(Integer pageNum, Integer pageSize, IPage iPage){
-        Map result = new HashMap();
-
-        result.put(constant.getCount(),iPage.getTotal());
-        result.put(constant.getPageNum(),pageNum);
-        result.put(constant.getPageSize(), pageSize);
-        result.put(constant.getPageTotal(),iPage.getPages());
-        if(iPage.getTotal() == 0){
-            result.put(constant.getList(),new ArrayList<>());
-            return result;
-        }
-
-        result.put(constant.getList(),iPage.getRecords());
-        return result;
-    }
 
     /**
      * 对查询结果二次封装返回首页的tag对象
-     * @param list
-     * @return
      */
     private List<Tag> getRecords(List<TagEntity> list){
         List<Tag> tagList = new ArrayList<>();
@@ -103,22 +76,15 @@ public class TagService {
 
     /**
      * 获取默认tag列表
-     * @return
      */
     public List<String> createTagNameList(){
         List<TagEntity> tagEntityList = tagMapper.selectList(null);
-        List<String> list = new ArrayList<>();
-        for (TagEntity tagEntity : tagEntityList) {
-            list.add(tagEntity.getTitle());
-        }
-        return list;
+
+        return tagEntityList.stream().map(TagEntity::getTitle).collect(Collectors.toList());
     }
 
     /**
      * 构建new tag 并入库
-     * @param tagRequest
-     * @param request
-     * @return
      */
     public Integer newTag(TagRequest tagRequest, HttpServletRequest request){
         //检查user信息
@@ -128,49 +94,38 @@ public class TagService {
         //创建TagEntity
         TagEntity tagEntity = createNewTag(userId, tagRequest);
 
-        int count = tagMapper.insert(tagEntity);
-
-        return count;
+        return tagMapper.insert(tagEntity);
     }
 
     /**
      * 创建new tag entity
-     * @param userId
-     * @param tagRequest
-     * @return
      */
     private TagEntity createNewTag(Integer userId, TagRequest tagRequest){
         TagEntity entity = new TagEntity();
         entity.setUserId(userId);
         entity.setTitle(tagRequest.getTitle());
         entity.setDescr(tagRequest.getDescr());
-//        entity.setCreatedAt(new Date());
-//        entity.setUpdatedAt(new Date());
         return entity;
     }
 
     /**
      * 更新Tag
-     * @param request
-     * @return
      */
     public Integer updateTag(TagUpdateRequest request){
         TagEntity entity = createUpdateTag(request);
-        int count = tagMapper.updateById(entity);
-        return count;
+        return tagMapper.updateById(entity);
     }
 
     private TagEntity createUpdateTag(TagUpdateRequest request){
-        TagEntity entity = tagMapper.selectById(request.getId());
+        TagEntity entity = new TagEntity();
+        entity.setId(request.getId());
         entity.setTitle(request.getTitle());
         entity.setDescr(request.getDescr());
-//        entity.setUpdatedAt(new Date());
         return entity;
     }
 
     public Integer deleteTagById(String id){
-        int count = tagMapper.deleteById(id);
-        return count;
+        return tagMapper.deleteById(id);
     }
 
     public void updateTagUsedCount(){
@@ -184,7 +139,7 @@ public class TagService {
             Integer queryCount = queryTagCountFromBlog(tagName);
             log.info("Tag title: {}, usedCount: {} , queryCount: {}", tagName, usedCount,
                     queryCount);
-            if(queryCount != usedCount){
+            if(!queryCount.equals(usedCount)){
                 entity.setUsedCount(queryCount);
                 int updateCount = tagMapper.updateById(entity);
                 sum = sum + updateCount;
@@ -198,15 +153,13 @@ public class TagService {
         QueryWrapper<BlogEntity> qw = new QueryWrapper<>();
         qw.like("tags",tagName);
 
-        Integer count = blogMapper.selectCount(qw);
-        return count;
+        return blogMapper.selectCount(qw);
     }
 
     public TagEntity queryTagByName(String tagName){
         QueryWrapper<TagEntity> qw = new QueryWrapper<>();
         qw.eq("title", tagName);
 
-        TagEntity entity = tagMapper.selectOne(qw);
-        return entity;
+        return tagMapper.selectOne(qw);
     }
 }

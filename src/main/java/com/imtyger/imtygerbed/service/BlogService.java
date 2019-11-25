@@ -1,13 +1,13 @@
 package com.imtyger.imtygerbed.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.imtyger.imtygerbed.Constant;
 import com.imtyger.imtygerbed.bean.blog.BlogNewRequest;
 import com.imtyger.imtygerbed.bean.blog.BlogUpdateRequest;
-import com.imtyger.imtygerbed.common.Constant;
-import com.imtyger.imtygerbed.common.Result;
-import com.imtyger.imtygerbed.common.exception.BusinessException;
+import com.imtyger.imtygerbed.common.PageResult;
 import com.imtyger.imtygerbed.entity.BlogEntity;
 import com.imtyger.imtygerbed.entity.TagEntity;
 import com.imtyger.imtygerbed.mapper.BlogMapper;
@@ -17,10 +17,14 @@ import com.imtyger.imtygerbed.utils.CheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -43,40 +47,32 @@ public class BlogService {
 
     /**
      * 获取展示博客总数
-     * @return
      */
-    public Integer queryBlogTotal(){
+    public int queryBlogTotal(){
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", 0);
 
-        Integer count = blogMapper.selectCount(queryWrapper);
-        return count;
+        return blogMapper.selectCount(queryWrapper);
     }
 
     /**
      * 根据状态：0（展示）为条件获取分页
-     * @param page
-     * @return
      */
     private IPage<BlogEntity> queryBlogIPage(Page page){
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", 0);
 
-        IPage<BlogEntity> iPage = blogMapper.selectPage(page, queryWrapper);
-        return iPage;
+        return (IPage<BlogEntity>) blogMapper.selectPage(page, queryWrapper);
     }
 
     /**
      * 获取首页分页博客
-     * @param pageNum
-     * @param pageSize
-     * @return
      */
     public Map<String,Object> queryBlogs(Integer pageNum, Integer pageSize){
         Page page = new Page(pageNum, pageSize);
         IPage<BlogEntity> iPage = queryBlogIPage(page);
 
-        Map result = getBlogResult(pageNum, pageSize, iPage);
+        Map result = PageResult.getResult(pageNum, pageSize, iPage);
         List<BlogEntity> list = (List<BlogEntity>) result.get(constant.getList());
         if(!list.isEmpty()){
             result.put(constant.getList(),parseRecords(list));
@@ -86,15 +82,12 @@ public class BlogService {
 
     /**
      * 获取Home页分页博客
-     * @param pageNum
-     * @param pageSize
-     * @return
      */
     public Map<String,Object> queryHomeBlogs(Integer pageNum, Integer pageSize){
         Page page = new Page(pageNum, pageSize);
-        IPage<BlogEntity> iPage = blogMapper.selectPage(page,new QueryWrapper<>());
+        IPage iPage = blogMapper.selectPage(page,new QueryWrapper<>());
 
-        Map result = getBlogResult(pageNum, pageSize, iPage);
+        Map result = PageResult.getResult(pageNum, pageSize, iPage);
         List<BlogEntity> list = (List<BlogEntity>) result.get(constant.getList());
         if(!list.isEmpty()){
             result.put(constant.getList(),parseHomeRecords(list));
@@ -104,15 +97,13 @@ public class BlogService {
 
     /**
      * 获取search模糊查询
-     * @param query
-     * @return
      */
     public List<Blog> searchLike(String query){
-        QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status",0);
-        queryWrapper.and(wrapper -> wrapper.like("title", query).or().like("content", query));
+        QueryWrapper<BlogEntity> qw = new QueryWrapper<>();
+        qw.eq("status",0);
+        qw.and(wrapper -> wrapper.like("title", query).or().like("content", query));
 
-        List<BlogEntity> blogEntityList = blogMapper.selectList(queryWrapper);
+        List<BlogEntity> blogEntityList = blogMapper.selectList(qw);
         List<Blog> blogList = new ArrayList<>();
         if(!blogEntityList.isEmpty()){
             blogList = parseRecords(blogEntityList);
@@ -122,50 +113,33 @@ public class BlogService {
 
     /**
      * 获取关于
-     * @return
      */
     public BlogShow getAboutBlog(){
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("title", "关于本博客");
 
         BlogEntity blogEntity = blogMapper.selectOne(queryWrapper);
-        BlogShow blogShow = createBlogShow(blogEntity);
-
-        return blogShow;
+        return createBlogShow(blogEntity);
     }
 
     /**
-     * 通过id获取博客详情
-     * @param id
-     * @return
+     * 通过id获取博客详情并增加浏览数
      */
     public BlogShow postBlogId(String id){
         BlogEntity blogEntity = blogMapper.selectById(id);
         updateViews(blogEntity);
-        BlogShow blogShow = createBlogShow(blogEntity);
-        return blogShow;
+        return createBlogShow(blogEntity);
     }
 
     /**
      * 删除blog by id
-     * @param id
-     * @return
      */
     public Integer deleteBlogById(String id){
-        BlogEntity blogEntity = blogMapper.selectById(id);
-        if(blogEntity == null){
-            throw new BusinessException(Result.fail().getCode(),Result.fail().getMsg());
-        }
-
-        int count = blogMapper.deleteById(id);
-
-        return count;
+        return blogMapper.deleteById(id);
     }
 
     /**
-     * ID获取blog entity
-     * @param id
-     * @return
+     * ID获取blog 编辑页
      */
     public BlogEdit getBlogById(String id){
         BlogEntity blogEntity = blogMapper.selectById(id);
@@ -180,29 +154,36 @@ public class BlogService {
 
     /**
      * 更新blog
-     * @param blogUpdateRequest
-     * @return
      */
     public Integer updateBlog(BlogUpdateRequest blogUpdateRequest){
         BlogEntity blogEntity = createUpdateBlogEntity(blogUpdateRequest);
 
-        int count = blogMapper.updateById(blogEntity);
-        return count;
+        return updateBlogById(blogUpdateRequest.getId(),blogEntity);
     }
 
     /**
      * 更新博客展示状态
-     * @param id
-     * @param status
-     * @return
      */
-    public Integer updateBlogStatus(String id, Integer status){
-        BlogEntity blogEntity = blogMapper.selectById(id);
+    public Integer updateBlogStatus(Integer id, Integer status){
+        BlogEntity blogEntity = new BlogEntity();
         blogEntity.setStatus(status);
-        int count = blogMapper.updateById(blogEntity);
-        return count;
+        return updateBlogById(id, blogEntity);
     }
 
+    /**
+     * 通过id 更新博客
+     */
+    private Integer updateBlogById(Integer id, BlogEntity blogEntity){
+        UpdateWrapper<BlogEntity> uw = new UpdateWrapper<>();
+        uw.eq("id",id);
+
+        return blogMapper.update(blogEntity, uw);
+    }
+
+
+    /**
+     * tag获取blog list
+     */
     public List<BlogList> getBlogListByTag(String tag){
         QueryWrapper<BlogEntity> qw = new QueryWrapper<>();
         qw.like("tags",tag);
@@ -225,9 +206,9 @@ public class BlogService {
         return blogLists;
     }
 
-    private BlogEntity createUpdateBlogEntity(BlogUpdateRequest blogUpdateRequest){
-        Integer id = blogUpdateRequest.getId();
-        BlogEntity blogEntity = blogMapper.selectById(id);
+    private BlogEntity createUpdateBlogEntity(@NotNull BlogUpdateRequest blogUpdateRequest){
+        BlogEntity blogEntity = new BlogEntity();
+        blogEntity.setId(blogUpdateRequest.getId());
         blogEntity.setTitle(blogUpdateRequest.getTitle());
         blogEntity.setContent(blogUpdateRequest.getContent());
         blogEntity.setHtml(blogUpdateRequest.getHtml());
@@ -262,10 +243,8 @@ public class BlogService {
 
     /**
      * 展示博文Obj
-     * @param blogEntity
-     * @return
      */
-    private BlogShow createBlogShow(BlogEntity blogEntity){
+    private BlogShow createBlogShow(@NotNull BlogEntity blogEntity){
         BlogShow blogShow = new BlogShow();
         blogShow.setId(blogEntity.getId());
         blogShow.setTitle(blogEntity.getTitle());
@@ -275,33 +254,9 @@ public class BlogService {
         return blogShow;
     }
 
-    /**
-     * 封装博客返回结果
-     * @param pageNum
-     * @param pageSize
-     * @param iPage
-     * @return
-     */
-    private Map<String, Object> getBlogResult(Integer pageNum, Integer pageSize, IPage iPage){
-        Map result = new HashMap();
-
-        result.put(constant.getCount(),iPage.getTotal());
-        result.put(constant.getPageNum(),pageNum);
-        result.put(constant.getPageSize(),pageSize);
-        result.put(constant.getPageTotal(),iPage.getPages());
-        if(iPage.getTotal() == 0){
-            result.put(constant.getList(),new ArrayList<>());
-            return result;
-        }
-
-        result.put(constant.getList(),iPage.getRecords());
-        return result;
-    }
 
     /**
      * 对分页查询结果二次封装返回首页的blog对象
-     * @param list
-     * @return
      */
     private List<Blog> parseRecords(List<BlogEntity> list){
         List<Blog> blogList = new ArrayList<>();
@@ -319,10 +274,8 @@ public class BlogService {
 
     /**
      * 对分页查询结果二次封装返回HOME页的blog对象
-     * @param list
-     * @return
      */
-    private List<BlogHome> parseHomeRecords(List<BlogEntity> list){
+    private List<BlogHome> parseHomeRecords(@NotNull List<BlogEntity> list){
         List<BlogHome> blogList = new ArrayList<>();
         list.forEach(blogEntity -> {
             BlogHome blogHome = new BlogHome();
@@ -340,9 +293,8 @@ public class BlogService {
 
     /**
      * 更新浏览量
-     * @param blogEntity
      */
-    private void updateViews(BlogEntity blogEntity){
+    private void updateViews(@NotNull BlogEntity blogEntity){
         Integer views = blogEntity.getViews();
         blogEntity.setViews(views + 1);
         blogMapper.updateById(blogEntity);
@@ -351,9 +303,6 @@ public class BlogService {
 
     /**
      * 构建BlogEntity并入库
-     * @param blogNewRequest
-     * @param request
-     * @return
      */
     public int newBlog(BlogNewRequest blogNewRequest, HttpServletRequest request){
         //检查user信息
@@ -374,11 +323,8 @@ public class BlogService {
 
     /**
      * 构建新BlogEntity
-     * @param userId
-     * @param blogNewRequest
-     * @return
      */
-    private BlogEntity createNewBlogEntity(Integer userId,BlogNewRequest blogNewRequest){
+    private BlogEntity createNewBlogEntity(Integer userId, @NotNull BlogNewRequest blogNewRequest){
         BlogEntity blogEntity = new BlogEntity();
         blogEntity.setUserId(userId);
         blogEntity.setTitle(blogNewRequest.getTitle());
@@ -395,20 +341,18 @@ public class BlogService {
 
     /**
      * 将tag字符串按逗号分解成list
-     * @param tags
-     * @return
      */
-    private List<String> creatTagList(@NotNull String tags){
+    private List<String> creatTagList(String tags){
         List<String> list = new ArrayList<>();
-        if(!tags.isEmpty()){
+        if(!StringUtils.isEmpty(tags)){
             list = Arrays.asList(tags.split(","));
         }
         return list;
     }
 
-    private void updateNewBlogTagCount(List<String> list){
-        for(String str: list){
-            TagEntity entity = tagService.queryTagByName(str);
+    private void updateNewBlogTagCount(@NotNull List<String> list){
+        for(String tagName: list){
+            TagEntity entity = tagService.queryTagByName(tagName);
             int count = entity.getUsedCount();
             entity.setUsedCount(count + 1);
             tagMapper.updateById(entity);

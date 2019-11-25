@@ -1,13 +1,13 @@
 package com.imtyger.imtygerbed.interceptor;
 
-import com.imtyger.imtygerbed.common.Constant;
-import com.imtyger.imtygerbed.common.ResultCode;
-import com.imtyger.imtygerbed.common.annotation.PassToken;
-import com.imtyger.imtygerbed.common.exception.NullOrEmptyException;
-import com.imtyger.imtygerbed.common.exception.TokenNotFoundException;
+import cn.hutool.core.util.StrUtil;
+import com.imtyger.imtygerbed.common.Result;
+import com.imtyger.imtygerbed.annotation.PassToken;
+import com.imtyger.imtygerbed.exception.BusinessException;
 import com.imtyger.imtygerbed.utils.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -20,78 +20,62 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @ClassName JwtInterceptor
- * @Description TODO
- * @Author Lenovo
+ * @Author imtyger@gmail.com
  * @Date 2019/5/29 14:00
- * @Version 1.0
- **/
-@Slf4j
+ */
+
 @Component
+@Slf4j
 public class JwtInterceptor extends HandlerInterceptorAdapter {
 
 	@Resource
 	private JwtTokenUtil jwtTokenUtil;
 
-	@Resource
-	private Constant constant;
+	@Value("${jwt.header}")
+	private String header;
+
+	@Value("${jwt.prefix}")
+	private String prefix;
+
+	@Value("${jwt.userKey}")
+	private String userKey;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
 							 Object handler){
 
+		log.info("Request URI：{}", request.getRequestURI());
+
+		// 如果不是HandlerMethod或者忽略登录,无需校验token
 		if (!(handler instanceof HandlerMethod) || ((HandlerMethod) handler).
 				getMethodAnnotation(PassToken.class) != null) {
-			//如果不是HandlerMethod或者忽略登录
-			// logger.info("无需token校验,handler:{}", handler);
+			log.info("无需token校验,handler:{}", handler);
 			return true;
 		}
 
-		log.info("####################################");
-		log.info("路由： " + request.getRequestURI());
-		log.info("####################################");
-
 		//通过request获取请求token信息
-		String authorization = request.getHeader(constant.getHeader());
-		log.info("authorization:" + authorization);
+		String authorizationStr = request.getHeader(header);
+		log.info("Header authorization: {}", authorizationStr);
 
-		//判断请求头信息是否为空，
-		if(authorization == null || StringUtils.isEmpty(authorization) || authorization.trim().equals(constant.getNullStr())){
-			//errorMsg = "Header:Authorization is null or empty.";
-			throw new NullOrEmptyException(ResultCode.UNAUTHORIZED.getCode(),ResultCode.UNAUTHORIZED.getMsg());
+		if (!StringUtils.isEmpty(authorizationStr) || authorizationStr.startsWith(prefix)) {
+
+			String tokenStr = authorizationStr.replace(prefix + StrUtil.SPACE, StrUtil.EMPTY);
+			if (!StringUtils.isEmpty(tokenStr)) {
+
+				Claims claims = jwtTokenUtil.parseToken(tokenStr);
+				boolean isExpired = jwtTokenUtil.isTokenExpired(tokenStr);
+				if (!isExpired) {
+					request.setAttribute(userKey, claims.getSubject());
+					return true;
+				}
+			}
 		}
 
-		//判断是否以Bearer 开头
-		if(!authorization.startsWith(constant.getPrefix())) {
-			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"Authorization:Bearer not found.");
-		}
-
-		//取出token 判断是否为空或null
-		String token = authorization.replace(constant.getPrefix() + " ","");
-		if(StringUtils.isEmpty(token) || token == null || token.trim().equals(constant.getNullStr())){
-			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token is empty or null.");
-		}
-
-		//解析token 判断claims是否为空
-		Claims claims = jwtTokenUtil.parseToken(token);
-		if(claims == null || claims.isEmpty() || claims.getSubject().isEmpty()){
-			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"parse token failed, claims not found.");
-		}
-
-		//判断token是否失效
-		boolean b = jwtTokenUtil.isTokenExpired(token);
-		if(b){
-			throw new TokenNotFoundException(ResultCode.UNAUTHORIZED.getCode(),"token expired.");
-		}
-		request.setAttribute(constant.getUserKey(),claims.getSubject());
-
-		return true;
+		throw new BusinessException(Result.UNAUTHORIZED.getValue(), "暂未登录或token已经过期");
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response,
-						   Object handler, @Nullable ModelAndView modelAndView) throws Exception {
-		// logger.info("===postHandle===");
+						   Object handler, @Nullable ModelAndView modelAndView) {
 	}
-
 }

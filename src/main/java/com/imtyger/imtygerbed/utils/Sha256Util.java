@@ -58,8 +58,6 @@ public class Sha256Util {
 	 * @return
 	 */
 	public static boolean validatePassword(String password, String savePassword){
-		System.out.println(password);
-		System.out.println(savePassword);
 		String encode = getSHA256(savePassword);
 		//密码错误
 		if(encode == null || password.trim().equals(encode)){
