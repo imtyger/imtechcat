@@ -1,5 +1,7 @@
 package com.imtyger.imtygerbed.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
  * @Date 2019/6/5 15:00
  * @Version 1.0
  **/
+@Slf4j
 public class Sha256Util {
 
 	/*
@@ -58,9 +61,9 @@ public class Sha256Util {
 	 * @return
 	 */
 	public static boolean validatePassword(String password, String savePassword){
-		String encode = getSHA256(savePassword);
+		String encode = getSHA256(password);
 		//密码错误
-		if(encode == null || password.trim().equals(encode)){
+		if(encode == null || !savePassword.trim().equals(encode)){
 			return false;
 		}
 		return true;

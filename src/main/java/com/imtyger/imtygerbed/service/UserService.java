@@ -12,6 +12,7 @@ import com.imtyger.imtygerbed.mapper.UserMapper;
 import com.imtyger.imtygerbed.model.User;
 import com.imtyger.imtygerbed.utils.IpAddressUtil;
 import com.imtyger.imtygerbed.utils.JwtTokenUtil;
+import com.imtyger.imtygerbed.utils.RedisUtil;
 import com.imtyger.imtygerbed.utils.Sha256Util;
 import lombok.extern.slf4j.Slf4j;
 import nl.bitwalker.useragentutils.UserAgent;
@@ -39,6 +40,9 @@ public class UserService {
 
 	@Resource
 	private Constant constant;
+
+	@Resource
+	private RedisUtil redisUtil;
 
 	/**
 	 * 根据用户名和密码登录
@@ -71,10 +75,33 @@ public class UserService {
 	 * 检查密码是否正确
 	 */
 	private void checkPassword(@NotNull LoginRequest loginRequest, String savePassword){
+		String cacheKey = "login:username:" + loginRequest.getUsername();
+		String cacheValue = redisUtil.get(cacheKey);
+		boolean login = checkPwdFailCache(cacheValue);
+		if(!login){
+			throw new BusinessException(Result.FAIL.getValue(), "当前用户密码已输错五次，禁止登陆");
+		}
+
 		boolean flag = Sha256Util.validatePassword(loginRequest.getPassword(), savePassword);
 		if(!flag) {
+			savePwdFailCache(cacheKey);
 			throw new BusinessException(Result.FAIL.getValue(), "密码错误");
 		}
+		redisUtil.delete(cacheKey);
+	}
+
+	private void savePwdFailCache(String cacheKey){
+		long incr = redisUtil.incr(cacheKey);
+		if(incr == 1){
+			redisUtil.expire(cacheKey, 24 * 60 * 60);
+		}
+	}
+
+	private boolean checkPwdFailCache(String cacheValue){
+		if(cacheValue != null && Integer.parseInt(cacheValue) == 5){
+			return false;
+		}
+		return true;
 	}
 
 	/**

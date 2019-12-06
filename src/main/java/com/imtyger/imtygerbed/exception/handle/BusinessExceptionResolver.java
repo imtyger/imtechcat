@@ -43,7 +43,7 @@ public class BusinessExceptionResolver implements HandlerExceptionResolver {
     private ModelAndView transformMV(Integer code, String msg) {
         Map<String, Object> map = new HashMap();
         map.put("code", code);
-        map.put("message", msg);
+        map.put("msg", msg);
         return new ModelAndView(new MappingJackson2JsonView(), map);
     }
 }

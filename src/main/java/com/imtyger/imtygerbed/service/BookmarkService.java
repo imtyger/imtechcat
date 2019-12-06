@@ -35,7 +35,11 @@ public class BookmarkService {
      */
     public Map queryBookmarks(Integer pageNum, Integer pageSize){
         Page page = new Page(pageNum, pageSize);
-        IPage iPage = bookmarkMapper.selectPage(page, new QueryWrapper<>());
+
+        QueryWrapper<BookmarkEntity> qw = new QueryWrapper<>();
+        qw.orderByDesc("createdAt");
+        
+        IPage iPage = bookmarkMapper.selectPage(page, qw);
 
         Map result = PageResult.getResult(pageNum, pageSize, iPage);
         List<BookmarkEntity> list = (List<BookmarkEntity>) result.get("list");

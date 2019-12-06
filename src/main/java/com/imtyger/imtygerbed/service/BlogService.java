@@ -1,5 +1,6 @@
 package com.imtyger.imtygerbed.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,6 +15,7 @@ import com.imtyger.imtygerbed.mapper.BlogMapper;
 import com.imtyger.imtygerbed.mapper.TagMapper;
 import com.imtyger.imtygerbed.model.*;
 import com.imtyger.imtygerbed.utils.CheckUtil;
+import com.imtyger.imtygerbed.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,9 @@ public class BlogService {
     @Resource
     private Constant constant;
 
+    @Resource
+    private RedisUtil redisUtil;
+
     /**
      * 获取展示博客总数
      */
@@ -61,6 +66,7 @@ public class BlogService {
     private IPage<BlogEntity> queryBlogIPage(Page page){
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", 0);
+        queryWrapper.orderByDesc("createdAt");
 
         return (IPage<BlogEntity>) blogMapper.selectPage(page, queryWrapper);
     }
@@ -102,6 +108,7 @@ public class BlogService {
         QueryWrapper<BlogEntity> qw = new QueryWrapper<>();
         qw.eq("status",0);
         qw.and(wrapper -> wrapper.like("title", query).or().like("content", query));
+        qw.orderByDesc("createdAt");
 
         List<BlogEntity> blogEntityList = blogMapper.selectList(qw);
         List<Blog> blogList = new ArrayList<>();
@@ -115,26 +122,51 @@ public class BlogService {
      * 获取关于
      */
     public BlogShow getAboutBlog(){
+        //先从redis缓存中取 取到了返回 取不到去数据库中查询
+        String about = redisUtil.get("about");
+        if(!StringUtils.isEmpty(about)){
+            return JSONObject.parseObject(about, BlogShow.class);
+        }
+
         QueryWrapper<BlogEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("title", "关于本博客");
 
         BlogEntity blogEntity = blogMapper.selectOne(queryWrapper);
-        return createBlogShow(blogEntity);
+        BlogShow blogShow = createBlogShow(blogEntity);
+        //对象存进redis缓存
+        redisUtil.save("about", blogShow);
+
+        return blogShow;
     }
 
     /**
      * 通过id获取博客详情并增加浏览数
      */
     public BlogShow postBlogId(String id){
+        //先从redis缓存中取 取到了返回 取不到去数据库中查询
+        String blog = redisUtil.get("blog:id:" + id);
+        if(!StringUtils.isEmpty(blog)){
+            return JSONObject.parseObject(blog, BlogShow.class);
+        }
+
         BlogEntity blogEntity = blogMapper.selectById(id);
         updateViews(blogEntity);
-        return createBlogShow(blogEntity);
+
+        BlogShow blogShow = createBlogShow(blogEntity);
+
+        //对象存进redis缓存
+        redisUtil.save("blog:id:" + id, blogShow);
+
+        return blogShow;
     }
 
     /**
      * 删除blog by id
      */
     public Integer deleteBlogById(String id){
+
+        //删除redis缓存
+        redisUtil.delete("blog:id:" + id);
         return blogMapper.deleteById(id);
     }
 
@@ -158,6 +190,8 @@ public class BlogService {
     public Integer updateBlog(BlogUpdateRequest blogUpdateRequest){
         BlogEntity blogEntity = createUpdateBlogEntity(blogUpdateRequest);
 
+        //删除redis缓存
+        redisUtil.delete("blog:id:"+ blogUpdateRequest.getId());
         return updateBlogById(blogUpdateRequest.getId(),blogEntity);
     }
 
@@ -167,6 +201,9 @@ public class BlogService {
     public Integer updateBlogStatus(Integer id, Integer status){
         BlogEntity blogEntity = new BlogEntity();
         blogEntity.setStatus(status);
+
+        //删除redis缓存
+        redisUtil.delete("blog:id:" + id);
         return updateBlogById(id, blogEntity);
     }
 
@@ -176,7 +213,8 @@ public class BlogService {
     private Integer updateBlogById(Integer id, BlogEntity blogEntity){
         UpdateWrapper<BlogEntity> uw = new UpdateWrapper<>();
         uw.eq("id",id);
-
+        //删除redis缓存
+        redisUtil.delete("blog:id:" + id);
         return blogMapper.update(blogEntity, uw);
     }
 
@@ -313,6 +351,8 @@ public class BlogService {
         BlogEntity blogEntity = createNewBlogEntity(userId,blogNewRequest);
         //blog新增数据库
         int count = blogMapper.insert(blogEntity);
+        //存进redis缓存
+        redisUtil.save("blog:id:" + blogEntity.getId(), blogEntity);
         //更新tag usedCount的方法
         if(!blogNewRequest.getTags().isEmpty()){
             updateNewBlogTagCount(blogNewRequest.getTags());
