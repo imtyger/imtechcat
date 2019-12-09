@@ -1,14 +1,11 @@
 package com.imtyger.imtygerbed.controller;
 
-import com.imtyger.imtygerbed.common.Result;
-import com.imtyger.imtygerbed.bean.user.LoginRequest;
 import com.imtyger.imtygerbed.annotation.PassToken;
+import com.imtyger.imtygerbed.bean.user.LoginRequest;
+import com.imtyger.imtygerbed.common.Result;
 import com.imtyger.imtygerbed.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -32,5 +29,11 @@ public class UserController {
 	public Result loginPost(@RequestBody @Valid LoginRequest loginRequest,
 							HttpServletRequest request) {
 		return Result.success(userService.login(loginRequest, request));
+	}
+
+	@RequestMapping(value={"/1.0/home/record/login"},method = RequestMethod.GET)
+	public Result loginInfo(@RequestParam(required = false, defaultValue = "1") Integer pageNum,
+							@RequestParam(required = false, defaultValue = "30")Integer pageSize) {
+		return Result.success(userService.queryLoginInfo(pageNum,pageSize));
 	}
 }

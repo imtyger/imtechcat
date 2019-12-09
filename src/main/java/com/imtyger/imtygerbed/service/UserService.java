@@ -1,8 +1,11 @@
 package com.imtyger.imtygerbed.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.imtyger.imtygerbed.bean.user.LoginRequest;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.imtyger.imtygerbed.Constant;
+import com.imtyger.imtygerbed.bean.user.LoginRequest;
+import com.imtyger.imtygerbed.common.PageResult;
 import com.imtyger.imtygerbed.common.Result;
 import com.imtyger.imtygerbed.entity.LoginInfoEntity;
 import com.imtyger.imtygerbed.entity.UserEntity;
@@ -161,6 +164,20 @@ public class UserService {
 		loginInfoEntity.setUserAgent(getUserAgent(request));
 //		loginInfoEntity.setLastLoginAt(new Date());
 		loginInfoMapper.insert(loginInfoEntity);
+	}
+
+	/**
+	 * 获取用户登陆信息
+	 */
+	public Map<String,Object> queryLoginInfo(Integer pageNum, Integer pageSize){
+		Page page = new Page(pageNum, pageSize);
+
+		QueryWrapper<LoginInfoEntity> qw = new QueryWrapper<>();
+		qw.orderByDesc("lastLoginAt");
+		IPage iPage = loginInfoMapper.selectPage(page,qw);
+
+		return PageResult.getResult(pageNum, pageSize, iPage);
+
 	}
 
 	/**
