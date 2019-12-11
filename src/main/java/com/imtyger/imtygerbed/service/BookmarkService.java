@@ -8,7 +8,8 @@ import com.imtyger.imtygerbed.bean.bookmark.BookmarkUpdateRequest;
 import com.imtyger.imtygerbed.common.PageResult;
 import com.imtyger.imtygerbed.entity.BookmarkEntity;
 import com.imtyger.imtygerbed.mapper.BookmarkMapper;
-import com.imtyger.imtygerbed.model.Bookmark;
+import com.imtyger.imtygerbed.utils.HashidsUtil;
+import com.imtyger.imtygerbed.vo.Bookmark;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +66,7 @@ public class BookmarkService {
         List<Bookmark> bookmarkList = new ArrayList<>();
         list.forEach(entity -> {
             Bookmark bookmark = new Bookmark();
-            bookmark.setId(entity.getId());
+            bookmark.setId(HashidsUtil.encode(entity.getId()));
             bookmark.setTitle(entity.getTitle());
             bookmark.setLink(entity.getLink());
             bookmarkList.add(bookmark);
@@ -74,7 +75,7 @@ public class BookmarkService {
     }
 
     /**
-     * 构建BlogEntity并入库
+     * 构建BookmarkEntity并入库
      */
     public int newBookmark(BookmarkRequest bookmarkRequest, HttpServletRequest request){
         //检查user信息

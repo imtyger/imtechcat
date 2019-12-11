@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.model;
+package com.imtyger.imtygerbed.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +19,7 @@ import javax.validation.constraints.NotEmpty;
 public class Bookmark {
 
 	@NotEmpty
-	private Integer id;
+	private String id;
 
 	@NotEmpty
 	private String title;

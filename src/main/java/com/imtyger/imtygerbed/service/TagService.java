@@ -10,7 +10,8 @@ import com.imtyger.imtygerbed.entity.BlogEntity;
 import com.imtyger.imtygerbed.entity.TagEntity;
 import com.imtyger.imtygerbed.mapper.BlogMapper;
 import com.imtyger.imtygerbed.mapper.TagMapper;
-import com.imtyger.imtygerbed.model.Tag;
+import com.imtyger.imtygerbed.utils.HashidsUtil;
+import com.imtyger.imtygerbed.vo.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,7 @@ public class TagService {
         List<Tag> tagList = new ArrayList<>();
         list.forEach(entity -> {
             Tag tag = new Tag();
-            tag.setId(entity.getId());
+            tag.setId(HashidsUtil.encode(entity.getId()));
             tag.setTitle(entity.getTitle());
             tag.setUsedCount(entity.getUsedCount());
             tagList.add(tag);

@@ -1,10 +1,13 @@
 package com.imtyger.imtygerbed;
 
+import com.imtyger.imtygerbed.utils.HashidsUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @Author imtygerx@gmail.com
@@ -63,5 +66,15 @@ public class Constant {
 	@Value("${page.size}")
 	private String size;
 
+	@Value("${hashids.alphabet}")
+	private String alphabet;
+	@Value("${hashids.salt}")
+	private String salt;
+	@Value("${hashids.length}")
+	private String length;
 
+	@PostConstruct
+	public void init(){
+		HashidsUtil.setConfigInfo(this);
+	}
 }

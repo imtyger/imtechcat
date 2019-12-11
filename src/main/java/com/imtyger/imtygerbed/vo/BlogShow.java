@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.model;
+package com.imtyger.imtygerbed.vo;
 
 import lombok.Data;
 import lombok.ToString;
@@ -15,7 +15,7 @@ import java.util.List;
 public class BlogShow {
 
     @NotEmpty
-    private Integer id;
+    private String id;
 
     @NotEmpty
     private String title;

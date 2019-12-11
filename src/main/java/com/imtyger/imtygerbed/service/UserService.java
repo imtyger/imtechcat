@@ -12,7 +12,7 @@ import com.imtyger.imtygerbed.entity.UserEntity;
 import com.imtyger.imtygerbed.exception.BusinessException;
 import com.imtyger.imtygerbed.mapper.LoginInfoMapper;
 import com.imtyger.imtygerbed.mapper.UserMapper;
-import com.imtyger.imtygerbed.model.User;
+import com.imtyger.imtygerbed.vo.User;
 import com.imtyger.imtygerbed.utils.IpAddressUtil;
 import com.imtyger.imtygerbed.utils.JwtTokenUtil;
 import com.imtyger.imtygerbed.utils.RedisUtil;

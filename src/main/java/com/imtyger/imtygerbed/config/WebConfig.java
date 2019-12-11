@@ -22,15 +22,22 @@ public class WebConfig implements WebMvcConfigurer {
 	private BusinessExceptionResolver businessExceptionResolver;
 
 	@Resource
-	private JwtInterceptor interceptor;
+	private JwtInterceptor jwtInterceptor;
+
+//	@Resource
+//	private IDInterceptor idInterceptor;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry){
 		//添加拦截器
-		registry.addInterceptor(interceptor).addPathPatterns("/**")
-		.excludePathPatterns("/","/login");
+		registry.addInterceptor(jwtInterceptor)
+				.addPathPatterns("/**")
+				.excludePathPatterns("/","/login");
 				// "/swagger-ui.html","/swagger-resources", "/swagger-resources/**", "/v2/**");
-		// WebMvcConfigurer.super.addInterceptors(registry);
+				// WebMvcConfigurer.super.addInterceptors(registry);
+//		registry.addInterceptor(idInterceptor)
+//				.addPathPatterns("/**")
+//				.excludePathPatterns("/", "/login");
 	}
 
 	/**

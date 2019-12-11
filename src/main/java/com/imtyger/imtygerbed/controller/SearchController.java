@@ -2,7 +2,7 @@ package com.imtyger.imtygerbed.controller;
 
 import com.imtyger.imtygerbed.common.Result;
 import com.imtyger.imtygerbed.annotation.PassToken;
-import com.imtyger.imtygerbed.model.Blog;
+import com.imtyger.imtygerbed.vo.Blog;
 import com.imtyger.imtygerbed.service.BlogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.ModelMap;
@@ -33,8 +33,9 @@ public class SearchController {
 	@PassToken
 	public Result searchBlogList(@RequestParam(value="q", required=false)String query,
 								 ModelMap modelMap) {
-		List<Blog> blogList = new ArrayList<>();
 		query = query.trim();
+
+		List<Blog> blogList = new ArrayList<>();
 		if(!StringUtils.isEmpty(query)){
 			blogList = blogService.searchLike(query);
 		}

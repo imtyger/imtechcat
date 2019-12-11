@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.model;
+package com.imtyger.imtygerbed.vo;
 
 import lombok.Data;
 import lombok.ToString;
@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 public class Tag {
 
     @NotEmpty
-    private Integer id;
+    private String id;
 
     @NotEmpty
     private String title;

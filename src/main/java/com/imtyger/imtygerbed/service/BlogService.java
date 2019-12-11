@@ -13,9 +13,10 @@ import com.imtyger.imtygerbed.entity.BlogEntity;
 import com.imtyger.imtygerbed.entity.TagEntity;
 import com.imtyger.imtygerbed.mapper.BlogMapper;
 import com.imtyger.imtygerbed.mapper.TagMapper;
-import com.imtyger.imtygerbed.model.*;
 import com.imtyger.imtygerbed.utils.CheckUtil;
+import com.imtyger.imtygerbed.utils.HashidsUtil;
 import com.imtyger.imtygerbed.utils.RedisUtil;
+import com.imtyger.imtygerbed.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -143,6 +144,8 @@ public class BlogService {
      * 通过id获取博客详情并增加浏览数
      */
     public BlogShow postBlogId(String id){
+        id = String.valueOf(HashidsUtil.decode(id));
+
         //先从redis缓存中取 取到了返回 取不到去数据库中查询
         String blog = redisUtil.get("blog:id:" + id);
         if(!StringUtils.isEmpty(blog)){
@@ -235,7 +238,7 @@ public class BlogService {
         if(!list.isEmpty()){
             list.forEach(blogEntity -> {
                 BlogList blog = new BlogList();
-                blog.setId(blogEntity.getId());
+                blog.setId(HashidsUtil.encode(blogEntity.getId()));
                 blog.setTitle(blogEntity.getTitle());
                 blog.setCreatedAt(blogEntity.getCreatedAt());
                 blogLists.add(blog);
@@ -284,7 +287,7 @@ public class BlogService {
      */
     private BlogShow createBlogShow(@NotNull BlogEntity blogEntity){
         BlogShow blogShow = new BlogShow();
-        blogShow.setId(blogEntity.getId());
+        blogShow.setId(HashidsUtil.encode(blogEntity.getId()));
         blogShow.setTitle(blogEntity.getTitle());
         blogShow.setHtml(blogEntity.getHtml());
         blogShow.setTags(creatTagList(blogEntity.getTags()));
@@ -300,7 +303,7 @@ public class BlogService {
         List<Blog> blogList = new ArrayList<>();
         list.forEach(blogEntity -> {
             Blog blog = new Blog();
-            blog.setId(blogEntity.getId());
+            blog.setId(HashidsUtil.encode(blogEntity.getId()));
             blog.setTitle(blogEntity.getTitle());
             blog.setProfile(blogEntity.getProfile());
             blog.setTags(creatTagList(blogEntity.getTags()));

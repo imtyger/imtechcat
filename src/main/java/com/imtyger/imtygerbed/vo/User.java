@@ -1,4 +1,4 @@
-package com.imtyger.imtygerbed.model;
+package com.imtyger.imtygerbed.vo;
 
 import lombok.Data;
 import lombok.ToString;

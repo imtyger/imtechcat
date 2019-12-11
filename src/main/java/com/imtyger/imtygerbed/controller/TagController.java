@@ -4,7 +4,7 @@ import com.imtyger.imtygerbed.common.Result;
 import com.imtyger.imtygerbed.bean.tag.TagRequest;
 import com.imtyger.imtygerbed.bean.tag.TagUpdateRequest;
 import com.imtyger.imtygerbed.annotation.PassToken;
-import com.imtyger.imtygerbed.model.Tag;
+import com.imtyger.imtygerbed.vo.Tag;
 import com.imtyger.imtygerbed.service.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.ModelMap;
