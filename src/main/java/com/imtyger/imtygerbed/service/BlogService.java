@@ -19,6 +19,8 @@ import com.imtyger.imtygerbed.utils.RedisUtil;
 import com.imtyger.imtygerbed.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeanUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -50,6 +52,15 @@ public class BlogService {
 
     @Resource
     private RedisUtil redisUtil;
+
+    private final static String[] IGNORE_ID = new String[]{"id"};
+    private final static String[] IGNORE_TAGS= new String[]{"tags"};
+    private final static String[] IGNORE_ID_TAGS = new String[]{"id", "tags"};
+    private final static String[] IGNORE_PROFILE_TAGS = new String[]{"profile",
+            "tags"};
+    private final static String[] IGNORE_USERID_PROFILE_TAGS = new String[]{"userId", "profile",
+            "tags"};
+
 
     /**
      * 获取展示博客总数
@@ -180,9 +191,7 @@ public class BlogService {
         BlogEntity blogEntity = blogMapper.selectById(id);
 
         BlogEdit edit = new BlogEdit();
-        edit.setId(blogEntity.getId());
-        edit.setTitle(blogEntity.getTitle());
-        edit.setContent(blogEntity.getContent());
+        BeanUtils.copyProperties(blogEntity, edit, IGNORE_TAGS);
         edit.setTags(creatTagList(blogEntity.getTags()));
         return edit;
     }
@@ -233,26 +242,20 @@ public class BlogService {
         return createBlogList(list);
     }
 
-    private List<BlogList> createBlogList(List<BlogEntity> list){
+    private List<BlogList> createBlogList(@Nullable List<BlogEntity> list){
         List<BlogList> blogLists = new ArrayList<>();
-        if(!list.isEmpty()){
-            list.forEach(blogEntity -> {
-                BlogList blog = new BlogList();
-                blog.setId(HashidsUtil.encode(blogEntity.getId()));
-                blog.setTitle(blogEntity.getTitle());
-                blog.setCreatedAt(blogEntity.getCreatedAt());
-                blogLists.add(blog);
-            });
-        }
+        if(!list.isEmpty()) list.forEach(blogEntity -> {
+            BlogList blog = new BlogList();
+            BeanUtils.copyProperties(blogEntity, blog, IGNORE_ID);
+            blog.setId(HashidsUtil.encode(blogEntity.getId()));
+            blogLists.add(blog);
+        });
         return blogLists;
     }
 
     private BlogEntity createUpdateBlogEntity(@NotNull BlogUpdateRequest blogUpdateRequest){
         BlogEntity blogEntity = new BlogEntity();
-        blogEntity.setId(blogUpdateRequest.getId());
-        blogEntity.setTitle(blogUpdateRequest.getTitle());
-        blogEntity.setContent(blogUpdateRequest.getContent());
-        blogEntity.setHtml(blogUpdateRequest.getHtml());
+        BeanUtils.copyProperties(blogUpdateRequest, blogEntity, IGNORE_PROFILE_TAGS);
 
         String htmlBody = CheckUtil.getHtmlBody(blogUpdateRequest.getHtml());
         blogEntity.setProfile(createProfile(htmlBody));
@@ -287,11 +290,9 @@ public class BlogService {
      */
     private BlogShow createBlogShow(@NotNull BlogEntity blogEntity){
         BlogShow blogShow = new BlogShow();
+        BeanUtils.copyProperties(blogEntity, blogShow, IGNORE_ID_TAGS);
         blogShow.setId(HashidsUtil.encode(blogEntity.getId()));
-        blogShow.setTitle(blogEntity.getTitle());
-        blogShow.setHtml(blogEntity.getHtml());
         blogShow.setTags(creatTagList(blogEntity.getTags()));
-        blogShow.setCreatedAt(blogEntity.getCreatedAt());
         return blogShow;
     }
 
@@ -301,15 +302,13 @@ public class BlogService {
      */
     private List<Blog> parseRecords(List<BlogEntity> list){
         List<Blog> blogList = new ArrayList<>();
-        list.forEach(blogEntity -> {
+        for(BlogEntity blogEntity: list){
             Blog blog = new Blog();
+            BeanUtils.copyProperties(blogEntity, blog, IGNORE_ID_TAGS);
             blog.setId(HashidsUtil.encode(blogEntity.getId()));
-            blog.setTitle(blogEntity.getTitle());
-            blog.setProfile(blogEntity.getProfile());
             blog.setTags(creatTagList(blogEntity.getTags()));
-            blog.setCreatedAt(blogEntity.getCreatedAt());
             blogList.add(blog);
-        });
+        }
         return blogList;
     }
 
@@ -318,17 +317,12 @@ public class BlogService {
      */
     private List<BlogHome> parseHomeRecords(@NotNull List<BlogEntity> list){
         List<BlogHome> blogList = new ArrayList<>();
-        list.forEach(blogEntity -> {
+        for(BlogEntity blogEntity : list) {
             BlogHome blogHome = new BlogHome();
-            blogHome.setId(blogEntity.getId());
-            blogHome.setTitle(blogEntity.getTitle());
+            BeanUtils.copyProperties(blogEntity, blogHome, IGNORE_TAGS);
             blogHome.setTags(creatTagList(blogEntity.getTags()));
-            blogHome.setCreatedAt(blogEntity.getCreatedAt());
-            blogHome.setUpdatedAt(blogEntity.getUpdatedAt());
-            blogHome.setStatus(blogEntity.getStatus());
-            blogHome.setDeleted(blogEntity.getDeleted());
             blogList.add(blogHome);
-        });
+        }
         return blogList;
     }
 
@@ -369,10 +363,8 @@ public class BlogService {
      */
     private BlogEntity createNewBlogEntity(Integer userId, @NotNull BlogNewRequest blogNewRequest){
         BlogEntity blogEntity = new BlogEntity();
+        BeanUtils.copyProperties(blogNewRequest, blogEntity, IGNORE_USERID_PROFILE_TAGS);
         blogEntity.setUserId(userId);
-        blogEntity.setTitle(blogNewRequest.getTitle());
-        blogEntity.setContent(blogNewRequest.getContent());
-        blogEntity.setHtml(blogNewRequest.getHtml());
 
         String htmlBody = CheckUtil.getHtmlBody(blogNewRequest.getHtml());
         blogEntity.setProfile(createProfile(htmlBody));

@@ -11,6 +11,7 @@ import com.imtyger.imtygerbed.mapper.BookmarkMapper;
 import com.imtyger.imtygerbed.utils.HashidsUtil;
 import com.imtyger.imtygerbed.vo.Bookmark;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -66,9 +67,8 @@ public class BookmarkService {
         List<Bookmark> bookmarkList = new ArrayList<>();
         list.forEach(entity -> {
             Bookmark bookmark = new Bookmark();
+            BeanUtils.copyProperties(entity, bookmark, "id");
             bookmark.setId(HashidsUtil.encode(entity.getId()));
-            bookmark.setTitle(entity.getTitle());
-            bookmark.setLink(entity.getLink());
             bookmarkList.add(bookmark);
         });
         return bookmarkList;
@@ -95,12 +95,8 @@ public class BookmarkService {
      */
     private BookmarkEntity createNewBookmarkEntity(Integer userId, BookmarkRequest bookmarkRequest){
         BookmarkEntity entity = new BookmarkEntity();
+        BeanUtils.copyProperties(bookmarkRequest, entity, "userId");
         entity.setUserId(userId);
-        entity.setTitle(bookmarkRequest.getTitle());
-        entity.setDescr(bookmarkRequest.getDescr());
-        entity.setLink(bookmarkRequest.getLink());
-//        entity.setCreatedAt(new Date());
-//        entity.setUpdatedAt(new Date());
         return entity;
     }
 
@@ -125,11 +121,7 @@ public class BookmarkService {
      */
     private BookmarkEntity createUpdateBookmarkEntity(BookmarkUpdateRequest request){
         BookmarkEntity entity = new BookmarkEntity();
-        entity.setId(request.getId());
-        entity.setTitle(request.getTitle());
-        entity.setDescr(request.getDescr());
-        entity.setLink(request.getLink());
-//        entity.setUpdatedAt(new Date());
+        BeanUtils.copyProperties(request, new BookmarkEntity());
         return entity;
     }
 

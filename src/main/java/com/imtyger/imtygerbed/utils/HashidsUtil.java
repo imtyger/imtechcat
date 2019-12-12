@@ -34,4 +34,6 @@ public class HashidsUtil {
             throw new IllegalArgumentException("invalid id : " + id);
         }
     }
+
+
 }

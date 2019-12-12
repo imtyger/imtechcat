@@ -69,10 +69,4 @@ public class Sha256Util {
 		return true;
 	}
 
-
-	public static void main(String[] args){
-		String pwd = "MaXiaoHu~2019";
-		System.out.println(getSHA256(pwd));
-//1040019d258fc3f7976dd5015a5a1e3d6c4569cda63b5b8c169ff50e6508c91e
-	}
 }

@@ -20,6 +20,7 @@ import com.imtyger.imtygerbed.utils.Sha256Util;
 import lombok.extern.slf4j.Slf4j;
 import nl.bitwalker.useragentutils.UserAgent;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -135,10 +136,7 @@ public class UserService {
 	 */
 	private User getUserResult(@NotNull UserEntity userEntity){
         User user = new User();
-        user.setId(userEntity.getId());
-        user.setUsername(userEntity.getUsername());
-        user.setNickName(userEntity.getNickName());
-        user.setAvatar(userEntity.getAvatar());
+		BeanUtils.copyProperties(userEntity, user);
         return user;
     }
 

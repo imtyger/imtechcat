@@ -13,6 +13,7 @@ import com.imtyger.imtygerbed.mapper.TagMapper;
 import com.imtyger.imtygerbed.utils.HashidsUtil;
 import com.imtyger.imtygerbed.vo.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -67,9 +68,8 @@ public class TagService {
         List<Tag> tagList = new ArrayList<>();
         list.forEach(entity -> {
             Tag tag = new Tag();
+            BeanUtils.copyProperties(entity, tag, "id");
             tag.setId(HashidsUtil.encode(entity.getId()));
-            tag.setTitle(entity.getTitle());
-            tag.setUsedCount(entity.getUsedCount());
             tagList.add(tag);
         });
         return tagList;
@@ -103,9 +103,8 @@ public class TagService {
      */
     private TagEntity createNewTag(Integer userId, TagRequest tagRequest){
         TagEntity entity = new TagEntity();
+        BeanUtils.copyProperties(tagRequest, entity, "userId");
         entity.setUserId(userId);
-        entity.setTitle(tagRequest.getTitle());
-        entity.setDescr(tagRequest.getDescr());
         return entity;
     }
 
@@ -119,9 +118,7 @@ public class TagService {
 
     private TagEntity createUpdateTag(TagUpdateRequest request){
         TagEntity entity = new TagEntity();
-        entity.setId(request.getId());
-        entity.setTitle(request.getTitle());
-        entity.setDescr(request.getDescr());
+        BeanUtils.copyProperties(request, entity);
         return entity;
     }
 
