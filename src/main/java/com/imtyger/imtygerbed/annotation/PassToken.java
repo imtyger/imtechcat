@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author: imtygerx@gmail.com
+ * @Author: imtygerx@gmail.com
  */
 
 @Target({ElementType.METHOD,ElementType.TYPE})
