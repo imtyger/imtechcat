@@ -36,4 +36,5 @@ META-INF
 logs
 /src/main/resources/application-local.properties
 /src/main/resources/application-production.properties
+/src/main/resources/constant.properties
 /db/mysql/dml.sql
