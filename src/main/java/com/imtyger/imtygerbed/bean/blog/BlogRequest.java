@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * Created by 910888783@qq.com on 2019/11/21.
+ * @author imtyger@gmail.com
  */
 @Setter
 @Getter
