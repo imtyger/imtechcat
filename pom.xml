@@ -27,10 +27,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
@@ -42,24 +38,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
@@ -76,14 +54,6 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
@@ -93,12 +63,10 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.3</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-
         <!-- 引入mybatis plus依赖 -->
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -110,7 +78,6 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-
         <!--支持使用 JDBC 访问数据库-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -160,7 +127,6 @@
             <version>1.0.3</version>
         </dependency>
     </dependencies>
-
     <build>
         <finalName>imtyger-bed</finalName>
         <plugins>
@@ -173,5 +139,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
