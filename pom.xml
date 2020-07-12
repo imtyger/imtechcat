@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>com.imtyger</groupId>
-    <artifactId>imtyger-bed</artifactId>
+    <artifactId>imtechcat-api</artifactId>
     <packaging>jar</packaging>
-    <name>imtyger-bed</name>
-    <description>imtyger.com backed</description>
+    <name>imtechcat-api</name>
+    <description>imtechcat api system.</description>
 
     <properties>
         <java.version>1.8</java.version>
