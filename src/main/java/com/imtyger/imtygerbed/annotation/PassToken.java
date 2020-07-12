@@ -6,9 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @Author: imtygerx@gmail.com
- * @Date 2019/6/7 13:34
- * @Desc 跳过验证
+ * @author: imtygerx@gmail.com
  */
 
 @Target({ElementType.METHOD,ElementType.TYPE})
