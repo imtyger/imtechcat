@@ -15,9 +15,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 @MapperScan("com.imtyger.imtygerbed.mapper")
-public class ImTygerBedApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ImTygerBedApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 }
